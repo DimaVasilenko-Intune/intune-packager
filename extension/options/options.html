@@ -19,7 +19,7 @@
 
     <main class="page-main">
 
-      <!-- ── Backend-seksjon ── -->
+      <!-- ── Backend ── -->
       <section class="section">
         <h2 class="section-title">Backend</h2>
         <div class="field">
@@ -33,53 +33,231 @@
         <div id="backend-status" class="status-msg hidden"></div>
       </section>
 
-      <!-- ── AI-analyse ── -->
+      <!-- ── AI-leverandører ── -->
       <section class="section">
-        <h2 class="section-title">AI-analyse</h2>
-        <div class="field">
-          <label class="field-label">AI-leverandør</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" name="ai-provider" value="none" checked>
-              <span>Ingen AI — kun regex</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="ai-provider" value="openai">
-              <span>OpenAI (GPT-4o mini)</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="ai-provider" value="claude">
-              <span>Claude (Haiku)</span>
-            </label>
+        <h2 class="section-title">AI-leverandører</h2>
+
+        <div class="provider-global-row">
+          <div class="field-inline">
+            <label class="field-label" for="active-provider">Aktiv leverandør</label>
+            <select id="active-provider" class="select">
+              <option value="claude">Claude</option>
+              <option value="openai">OpenAI</option>
+              <option value="gemini">Google Gemini</option>
+              <option value="mistral">Mistral</option>
+            </select>
+          </div>
+          <div class="field-inline">
+            <label class="field-label">Modus</label>
+            <div class="mode-toggle">
+              <label class="mode-opt">
+                <input type="radio" name="analyze-mode" value="ai-first" checked>
+                <span>AI-first</span>
+              </label>
+              <label class="mode-opt">
+                <input type="radio" name="analyze-mode" value="regex-only">
+                <span>Kun regex</span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <div class="field" id="api-key-field" style="display:none">
-          <label class="field-label" for="api-key">API-nøkkel</label>
-          <div class="input-row">
-            <input type="password" id="api-key" class="input" placeholder="sk-...  /  sk-ant-...">
-            <button class="btn btn-ghost btn-sm" id="toggle-key" title="Vis/skjul">👁</button>
+        <!-- ── Claude ── -->
+        <div class="provider-card" data-provider="claude">
+          <div class="provider-header">
+            <div class="provider-title">
+              <span class="provider-icon">◆</span>
+              <span class="provider-name">Claude</span>
+              <span class="provider-sub">Anthropic</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="provider-enable" data-provider="claude">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
           </div>
-          <span class="field-hint">Lagres lokalt i Chrome — sendes kun til din valgte AI-leverandør</span>
+          <div class="provider-body">
+            <div class="field-row">
+              <label class="field-label">Modell</label>
+              <select class="select provider-model" data-provider="claude">
+                <option value="claude-opus-4-6">Claude Opus 4.6</option>
+                <option value="claude-sonnet-4-6" selected>Claude Sonnet 4.6</option>
+                <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label">API-nøkkel</label>
+              <div class="key-row">
+                <input type="password" class="input provider-apikey" data-provider="claude" placeholder="sk-ant-...">
+                <button class="btn btn-ghost btn-sm toggle-key" title="Vis/skjul">👁</button>
+                <button class="btn btn-secondary btn-sm test-provider" data-provider="claude">Test</button>
+              </div>
+            </div>
+            <div class="provider-status hidden"></div>
+          </div>
         </div>
+
+        <!-- ── OpenAI ── -->
+        <div class="provider-card" data-provider="openai">
+          <div class="provider-header">
+            <div class="provider-title">
+              <span class="provider-icon">⬡</span>
+              <span class="provider-name">OpenAI</span>
+              <span class="provider-sub">GPT-modeller</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="provider-enable" data-provider="openai">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="provider-body">
+            <div class="field-row">
+              <label class="field-label">Modell</label>
+              <select class="select provider-model" data-provider="openai">
+                <option value="gpt-4o" selected>GPT-4o</option>
+                <option value="gpt-4o-mini">GPT-4o mini</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="o1">o1</option>
+                <option value="o3">o3</option>
+                <option value="o3-mini">o3-mini</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label">Auth-metode</label>
+              <div class="auth-tabs">
+                <label class="auth-tab">
+                  <input type="radio" name="openai-auth" value="apikey" checked>
+                  <span>API-nøkkel</span>
+                </label>
+                <label class="auth-tab">
+                  <input type="radio" name="openai-auth" value="oauth">
+                  <span>OAuth</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- API key section -->
+            <div class="auth-section" id="openai-apikey-section">
+              <div class="key-row">
+                <input type="password" class="input provider-apikey" data-provider="openai" placeholder="sk-...">
+                <button class="btn btn-ghost btn-sm toggle-key" title="Vis/skjul">👁</button>
+                <button class="btn btn-secondary btn-sm test-provider" data-provider="openai">Test</button>
+              </div>
+            </div>
+
+            <!-- OAuth section -->
+            <div class="auth-section hidden" id="openai-oauth-section">
+              <div class="field-row">
+                <label class="field-label" for="openai-client-id">Client ID</label>
+                <input type="text" id="openai-client-id" class="input" placeholder="app-...">
+              </div>
+              <div class="oauth-row">
+                <button class="btn btn-accent btn-sm oauth-connect" data-provider="openai">🔗 Koble til OpenAI</button>
+                <span class="oauth-status" id="openai-oauth-status"></span>
+              </div>
+            </div>
+
+            <div class="provider-status hidden"></div>
+          </div>
+        </div>
+
+        <!-- ── Google Gemini ── -->
+        <div class="provider-card" data-provider="gemini">
+          <div class="provider-header">
+            <div class="provider-title">
+              <span class="provider-icon">✦</span>
+              <span class="provider-name">Google Gemini</span>
+              <span class="provider-sub">Generative AI</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="provider-enable" data-provider="gemini">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="provider-body">
+            <div class="field-row">
+              <label class="field-label">Modell</label>
+              <select class="select provider-model" data-provider="gemini">
+                <option value="gemini-2.0-flash" selected>Gemini 2.0 Flash</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                <option value="gemini-2.0-pro-exp">Gemini 2.0 Pro (exp)</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label">Auth-metode</label>
+              <div class="auth-tabs">
+                <label class="auth-tab">
+                  <input type="radio" name="gemini-auth" value="apikey">
+                  <span>API-nøkkel</span>
+                </label>
+                <label class="auth-tab">
+                  <input type="radio" name="gemini-auth" value="oauth" checked>
+                  <span>OAuth</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- API key section -->
+            <div class="auth-section hidden" id="gemini-apikey-section">
+              <div class="key-row">
+                <input type="password" class="input provider-apikey" data-provider="gemini" placeholder="AIza...">
+                <button class="btn btn-ghost btn-sm toggle-key" title="Vis/skjul">👁</button>
+                <button class="btn btn-secondary btn-sm test-provider" data-provider="gemini">Test</button>
+              </div>
+            </div>
+
+            <!-- OAuth section -->
+            <div class="auth-section" id="gemini-oauth-section">
+              <div class="field-row">
+                <label class="field-label" for="gemini-client-id">Client ID</label>
+                <input type="text" id="gemini-client-id" class="input" placeholder="123456789-abc.apps.googleusercontent.com">
+              </div>
+              <div class="oauth-row">
+                <button class="btn btn-accent btn-sm oauth-connect" data-provider="gemini">🔗 Koble til Google</button>
+                <span class="oauth-status" id="gemini-oauth-status"></span>
+              </div>
+            </div>
+
+            <div class="provider-status hidden"></div>
+          </div>
+        </div>
+
+        <!-- ── Mistral ── -->
+        <div class="provider-card" data-provider="mistral">
+          <div class="provider-header">
+            <div class="provider-title">
+              <span class="provider-icon">▲</span>
+              <span class="provider-name">Mistral</span>
+              <span class="provider-sub">mistral.ai</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="provider-enable" data-provider="mistral">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="provider-body">
+            <div class="field-row">
+              <label class="field-label">Modell</label>
+              <select class="select provider-model" data-provider="mistral">
+                <option value="mistral-large-latest" selected>Mistral Large</option>
+                <option value="mistral-medium-latest">Mistral Medium</option>
+                <option value="codestral-latest">Codestral</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label">API-nøkkel</label>
+              <div class="key-row">
+                <input type="password" class="input provider-apikey" data-provider="mistral" placeholder="...">
+                <button class="btn btn-ghost btn-sm toggle-key" title="Vis/skjul">👁</button>
+                <button class="btn btn-secondary btn-sm test-provider" data-provider="mistral">Test</button>
+              </div>
+            </div>
+            <div class="provider-status hidden"></div>
+          </div>
+        </div>
+
       </section>
 
-      <!-- ── Analysemodus ── -->
-      <section class="section">
-        <h2 class="section-title">Analysemodus</h2>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input type="radio" name="analyze-mode" value="ai-first" checked>
-            <span>AI-first med regex-fallback <em>(anbefalt)</em></span>
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="analyze-mode" value="regex-only">
-            <span>Kun regex (raskere, ingen API-kostnad)</span>
-          </label>
-        </div>
-      </section>
-
-      <!-- ── Lagre-knapp ── -->
+      <!-- ── Lagre ── -->
       <div class="actions">
         <button class="btn btn-primary" id="save-btn">Lagre innstillinger</button>
         <span class="save-status hidden" id="save-status">✓ Lagret</span>
@@ -98,12 +276,12 @@
             <span class="about-val" id="about-backend">—</span>
           </div>
           <div class="about-row">
-            <span class="about-key">AI-modus</span>
+            <span class="about-key">Aktiv AI</span>
             <span class="about-val" id="about-ai">Ingen</span>
           </div>
         </div>
         <p class="about-hint">
-          Backend-kode: <code>cd ~/intune-packager/backend &amp;&amp; npm start</code>
+          Backend: <code>cd ~/intune-packager/backend &amp;&amp; npm start</code>
         </p>
       </section>
 

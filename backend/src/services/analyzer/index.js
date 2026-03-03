@@ -1,24 +1,24 @@
 'use strict';
 
 const regexAnalyzer = require('./regex-analyzer');
-const aiAnalyzer    = require('./ai-analyzer');
+const providers     = require('../ai-providers');
 
 /**
  * Main analyzer orchestrator.
- * Chooses AI or regex based on settings, merges results.
  *
  * @param {object} opts
  * @param {string} opts.text
  * @param {string} opts.filename
  * @param {string} opts.type
  * @param {string} opts.url
- * @param {string} opts.aiProvider   - 'none' | 'claude' | 'openai'
- * @param {string} opts.aiKey
+ * @param {string} opts.aiProvider   - 'none' | 'claude' | 'openai' | 'gemini' | 'mistral'
+ * @param {string} opts.aiModel      - model identifier (e.g. 'claude-sonnet-4-6')
+ * @param {string} opts.aiKey        - API key (if authType=apikey)
+ * @param {string} opts.oauthToken   - OAuth access token (if authType=oauth)
  * @param {string} opts.mode         - 'ai-first' | 'regex-only'
- * @returns {Promise<AnalysisResult>}
  */
-async function analyze({ text, filename, type, url, aiProvider, aiKey, mode }) {
-  const useAI = mode !== 'regex-only' && aiProvider !== 'none' && aiKey;
+async function analyze({ text, filename, type, url, aiProvider, aiModel, aiKey, oauthToken, mode }) {
+  const useAI = mode !== 'regex-only' && aiProvider && aiProvider !== 'none' && (aiKey || oauthToken);
 
   // Always run regex (fast, no cost)
   const regexResult = regexAnalyzer.analyze({ text, filename, type, url });
@@ -29,9 +29,16 @@ async function analyze({ text, filename, type, url, aiProvider, aiKey, mode }) {
 
   // Try AI — fall back to regex on error
   try {
-    const aiResult = await runAI({ text, filename, type, aiProvider, apiKey: aiKey });
+    const aiResult = await providers.analyze({
+      provider:    aiProvider,
+      model:       aiModel,
+      apiKey:      aiKey,
+      oauthToken,
+      text,
+      filename,
+      type,
+    });
 
-    // Merge: AI wins for commands, regex wins for metadata
     return {
       ...regexResult,
       install:    aiResult.install    || regexResult.install,
@@ -39,22 +46,14 @@ async function analyze({ text, filename, type, url, aiProvider, aiKey, mode }) {
       detection:  aiResult.detection  || regexResult.detection,
       confidence: Math.max(aiResult.confidence, regexResult.confidence),
       aiUsed:     true,
+      aiProvider,
+      aiModel,
       aiNotes:    aiResult.notes || '',
     };
   } catch (err) {
-    console.warn(`[analyzer] AI failed, falling back to regex: ${err.message}`);
+    console.warn(`[analyzer] AI feilet (${aiProvider}/${aiModel}), faller tilbake til regex: ${err.message}`);
     return regexResult;
   }
-}
-
-async function runAI({ text, filename, type, aiProvider, apiKey }) {
-  if (aiProvider === 'claude') {
-    return aiAnalyzer.analyzeWithClaude({ text, filename, type, apiKey });
-  }
-  if (aiProvider === 'openai') {
-    return aiAnalyzer.analyzeWithOpenAI({ text, filename, type, apiKey });
-  }
-  throw new Error(`Unknown AI provider: ${aiProvider}`);
 }
 
 module.exports = { analyze };

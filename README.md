@@ -96,11 +96,11 @@ Et blått pakke-ikon dukker opp i Chrome-verktøylinjen. Klikk på det for å fe
 | **Automatisk deteksjon** | Skanner DOM for `.msi`, `.exe`, `.msix`-lenker og kodeblokker |
 | **BFS-crawler** | Crawles leverandørens nettsted (maks 10 sider) med retry og rate-limiting |
 | **Regex-analyse** | Utvidet mønstergjenkjenning for msiexec, Inno Setup, NSIS, InstallShield, WiX |
-| **AI-analyse** | Valgfri analyse via Claude (Haiku) eller OpenAI (GPT-4o mini) |
+| **AI-analyse** | Valgfri analyse via Claude, OpenAI, Google Gemini eller Mistral — med OAuth-støtte |
 | **ZIP-pakke** | Genererer komplett Intune-pakke med Install/Uninstall/Detection PS1-skript |
 | **En-klikk kopier** | Alle kommandoer har direkte kopieringsknapp |
 | **Mørkt tema** | 400px popup med moderne dark UI og state machine |
-| **Options-side** | Konfigurasjon av backend-URL, AI-leverandør og API-nøkkel |
+| **Options-side** | Provider-kort med toggle, modellvelger, API-nøkkel og OAuth per leverandør |
 
 ---
 
@@ -142,8 +142,14 @@ intune-packager/
         │   │   └── fetcher.js    HTTP + retry + rate-limiting
         │   ├── analyzer/
         │   │   ├── index.js      Velger AI eller regex, merger resultater
-        │   │   ├── ai-analyzer.js  Claude + OpenAI API-klienter
+        │   │   ├── ai-analyzer.js  Tynn shim → delegerer til ai-providers/
         │   │   └── regex-analyzer.js  Utvidede regex-mønstre
+        │   ├── ai-providers/
+        │   │   ├── index.js      Registry + dispatcher (felles prompt/parser)
+        │   │   ├── anthropic.js  Claude-adapter
+        │   │   ├── openai.js     OpenAI-adapter (API-nøkkel + OAuth)
+        │   │   ├── gemini.js     Gemini-adapter (API-nøkkel + OAuth)
+        │   │   └── mistral.js    Mistral-adapter (OpenAI-kompatibelt format)
         │   └── packager/
         │       ├── index.js      ZIP-generering med archiver
         │       └── templates/
@@ -225,16 +231,40 @@ Detection rule:    Custom script: Detection.ps1
 
 Gå til ⚙ **Innstillinger** i extension-popupen.
 
-| Innstilling | Beskrivelse |
+### Støttede leverandører
+
+| Leverandør | Auth | Modeller |
+|---|---|---|
+| **Claude** (Anthropic) | API-nøkkel | Opus 4.6, Sonnet 4.6, Haiku 4.5 |
+| **OpenAI** | API-nøkkel eller OAuth | GPT-4o, GPT-4o mini, GPT-4 Turbo, o1, o3, o3-mini |
+| **Google Gemini** | API-nøkkel eller OAuth | Gemini 2.0 Flash, Gemini 1.5 Pro, Gemini 2.0 Pro (exp) |
+| **Mistral** | API-nøkkel | Mistral Large, Mistral Medium, Codestral |
+
+### Oppsett
+
+1. Åpne **Innstillinger** (⚙-ikonet i popup-headeren)
+2. Velg **Aktiv leverandør** øverst
+3. Klikk på provider-kortet og slå på toggle
+4. Velg ønsket **modell** fra nedtrekkslisten
+5. Fyll inn **API-nøkkel** — eller bruk **OAuth** (Gemini / OpenAI)
+6. Klikk **Test** for å verifisere tilkoblingen
+7. Lagre innstillinger
+
+### OAuth-flyt (Gemini og OpenAI)
+
+1. Fyll inn **Client ID** fra din Google Cloud / OpenAI-applikasjon
+2. Klikk **Koble til Google / Koble til OpenAI**
+3. Fullfør autentisering i popup-vinduet som åpner seg
+4. Token lagres automatisk med utløpstidspunkt
+
+### Analysemodus
+
+| Modus | Beskrivelse |
 |---|---|
-| **AI-leverandør** | Ingen / OpenAI / Claude |
-| **API-nøkkel** | Lagres lokalt i Chrome storage, sendes kun til valgt AI |
-| **Analysemodus** | AI-first med regex-fallback (anbefalt) / Kun regex |
+| **AI-first** | AI analyserer teksten, regex brukes som fallback (anbefalt) |
+| **Kun regex** | Ingen API-kall, rask og gratis |
 
-**Claude (Haiku)** — rask og rimelig, god på strukturert ekstraksjon
-**OpenAI (GPT-4o mini)** — alternativ med god JSON-output
-
-Uten AI-nøkkel brukes alltid regex-analysen som fallback.
+Uten gyldig nøkkel/token faller extension automatisk tilbake til regex-analyse.
 
 ---
 
@@ -265,8 +295,10 @@ Uten AI-nøkkel brukes alltid regex-analysen som fallback.
 
 **Headers (valgfritt):**
 ```
-x-ai-provider: claude | openai | none
-x-ai-key: sk-ant-... | sk-...
+x-ai-provider:  claude | openai | gemini | mistral | none
+x-ai-model:     claude-sonnet-4-6 | gpt-4o | gemini-2.0-flash | mistral-large-latest
+x-ai-key:       API-nøkkel (hvis authType=apikey)
+x-ai-oauth:     OAuth access token (hvis authType=oauth)
 x-analyze-mode: ai-first | regex-only
 ```
 

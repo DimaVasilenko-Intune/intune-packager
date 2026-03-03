@@ -1,0 +1,14 @@
+# Node
+backend/node_modules/
+backend/.env
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -10,6 +10,69 @@ Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript me
 
 ---
 
+## ⚡ Quick Start (Windows — 5 minutter)
+
+> Ingen tidligere erfaring med Node.js eller Chrome-extensions nødvendig.
+
+### Steg 1 — Last ned repoet
+
+Klikk den grønne **Code**-knappen øverst → **Download ZIP** → pakk ut til f.eks. `C:\intune-packager\`
+
+*(Alternativt hvis du har Git: `git clone https://github.com/DimaVasilenko-Intune/intune-packager`)*
+
+### Steg 2 — Installer Node.js (én gang)
+
+1. Gå til **[nodejs.org](https://nodejs.org)** → last ned **LTS**-versjonen
+2. Kjør installeren, klikk Next hele veien
+3. Restart PC hvis du blir bedt om det
+
+Verifiser at det virket — åpne **Ledetekst** (`Win + R` → skriv `cmd` → Enter):
+```
+node --version
+```
+Skal vise noe som `v22.x.x`. Da er du klar.
+
+### Steg 3 — Start backend-serveren
+
+I samme Ledetekst-vindu:
+```
+cd C:\intune-packager\backend
+npm install
+npm start
+```
+
+`npm install` tar 30–60 sekunder første gang. Etterpå skal du se:
+```
+  Intune Packager backend
+  → http://localhost:3001/health
+```
+
+**La dette vinduet stå åpent** mens du bruker extension-en. Serveren stopper hvis du lukker det.
+
+### Steg 4 — Last inn extension i Chrome
+
+1. Åpne Chrome og gå til: `chrome://extensions/`
+2. Skru på **Developer mode** (toggle øverst til høyre)
+3. Klikk **Load unpacked**
+4. Naviger til mappen `C:\intune-packager\extension\` → klikk **Select Folder**
+
+Et blått pakke-ikon dukker opp i Chrome-verktøylinjen. Klikk på det for å feste det (📌).
+
+### Steg 5 — Test det
+
+1. Gå til f.eks. [7-zip.org/download.html](https://www.7-zip.org/download.html)
+2. Klikk extension-ikonet — du skal se **● Tilkoblet** øverst
+3. Klikk **Scan siden**
+4. Installer-kortene dukker opp → klikk et kort → kopier kommandoer eller last ned ZIP
+
+**Ferdig.** ZIP-filen inneholder Install.ps1, Uninstall.ps1 og Detection.ps1 klare for Intune.
+
+---
+
+> **Neste gang** trenger du bare å starte backend igjen (Steg 3) — Node.js og extension er allerede installert.
+
+---
+
 ## Skjermbilde
 
 ```

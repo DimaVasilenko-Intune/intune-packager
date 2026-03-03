@@ -1,8 +1,8 @@
 # Intune Packager
 
-> Chrome-extension + Node.js backend for å detektere og pakke Windows-installere til Microsoft Intune.
+> Chrome extension + Node.js backend for detecting and packaging Windows installers for Microsoft Intune.
 
-Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript med silent install/uninstall-kommandoer og detection rules — klar til bruk i Intune Win32-deployering.
+Automatically analyzes vendor pages and generates ready-to-use PowerShell scripts with silent install/uninstall commands and detection rules — ready for Intune Win32 app deployment.
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-green)
@@ -10,127 +10,127 @@ Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript me
 
 ---
 
-## ⚡ Quick Start (Windows — 5 minutter)
+## ⚡ Quick Start (Windows — 5 minutes)
 
-> Ingen tidligere erfaring med Node.js eller Chrome-extensions nødvendig.
+> No prior experience with Node.js or Chrome extensions required.
 
-### Steg 1 — Last ned repoet
+### Step 1 — Download the repo
 
-Klikk den grønne **Code**-knappen øverst → **Download ZIP** → pakk ut til f.eks. `C:\intune-packager\`
+Click the green **Code** button → **Download ZIP** → extract to e.g. `C:\intune-packager\`
 
-*(Alternativt hvis du har Git: `git clone https://github.com/DimaVasilenko-Intune/intune-packager`)*
+*(Or if you have Git: `git clone https://github.com/DimaVasilenko-Intune/intune-packager`)*
 
-### Steg 2 — Installer Node.js (én gang)
+### Step 2 — Install Node.js (once)
 
-1. Gå til **[nodejs.org](https://nodejs.org)** → last ned **LTS**-versjonen
-2. Kjør installeren, klikk Next hele veien
-3. Restart PC hvis du blir bedt om det
+1. Go to **[nodejs.org](https://nodejs.org)** → download the **LTS** version
+2. Run the installer, click Next all the way through
+3. Restart your PC if prompted
 
-Verifiser at det virket — åpne **Ledetekst** (`Win + R` → skriv `cmd` → Enter):
+Verify it worked — open **Command Prompt** (`Win + R` → type `cmd` → Enter):
 ```
 node --version
 ```
-Skal vise noe som `v22.x.x`. Da er du klar.
+Should show something like `v22.x.x`. You're ready.
 
-### Steg 3 — Start backend-serveren
+### Step 3 — Start the backend server
 
-I samme Ledetekst-vindu:
+In the same Command Prompt window:
 ```
 cd C:\intune-packager\backend
 npm install
 npm start
 ```
 
-`npm install` tar 30–60 sekunder første gang. Etterpå skal du se:
+`npm install` takes 30–60 seconds the first time. Then you should see:
 ```
   Intune Packager backend
   → http://localhost:3001/health
 ```
 
-**La dette vinduet stå åpent** mens du bruker extension-en. Serveren stopper hvis du lukker det.
+**Keep this window open** while using the extension. The server stops when you close it.
 
-### Steg 4 — Last inn extension i Chrome
+### Step 4 — Load the extension in Chrome
 
-1. Åpne Chrome og gå til: `chrome://extensions/`
-2. Skru på **Developer mode** (toggle øverst til høyre)
-3. Klikk **Load unpacked**
-4. Naviger til mappen `C:\intune-packager\extension\` → klikk **Select Folder**
+1. Open Chrome and go to: `chrome://extensions/`
+2. Enable **Developer mode** (toggle in the top right)
+3. Click **Load unpacked**
+4. Navigate to the `C:\intune-packager\extension\` folder → click **Select Folder**
 
-Et blått pakke-ikon dukker opp i Chrome-verktøylinjen. Klikk på det for å feste det (📌).
+A blue package icon appears in the Chrome toolbar. Click it to pin it (📌).
 
-### Steg 5 — Test det
+### Step 5 — Test it
 
-1. Gå til f.eks. [7-zip.org/download.html](https://www.7-zip.org/download.html)
-2. Klikk extension-ikonet — du skal se **● Tilkoblet** øverst
-3. Klikk **Scan siden**
-4. Installer-kortene dukker opp → klikk et kort → kopier kommandoer eller last ned ZIP
+1. Go to e.g. [7-zip.org/download.html](https://www.7-zip.org/download.html)
+2. Click the extension icon — you should see **● Connected** at the top
+3. Click **Scan page**
+4. Installer cards appear → click a card → copy commands or download ZIP
 
-**Ferdig.** ZIP-filen inneholder Install.ps1, Uninstall.ps1 og Detection.ps1 klare for Intune.
-
----
-
-> **Neste gang** trenger du bare å starte backend igjen (Steg 3) — Node.js og extension er allerede installert.
+**Done.** The ZIP contains Install.ps1, Uninstall.ps1 and Detection.ps1 ready for Intune.
 
 ---
 
-## Skjermbilde
+> **Next time** you only need to start the backend again (Step 3) — Node.js and the extension are already installed.
+
+---
+
+## Screenshot
 
 ```
 ┌─────────────────────────────────────────┐
-│  📦 Intune Packager        ● Tilkoblet ⚙│
+│  📦 Intune Packager        ● Connected ⚙│
 ├─────────────────────────────────────────┤
 │  [MSI]  Setup-3.2.1-x64.msi      ●HIGH │
-│  v3.2.1 · 45 MB · Funnet på siden       │
+│  v3.2.1 · 45 MB · Found on page         │
 ├─────────────────────────────────────────┤
 │  [EXE]  zoom_x64.exe             ◐MED  │
-│  Funnet på siden                        │
+│  Found on page                          │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
-## Funksjoner
+## Features
 
-| Funksjon | Beskrivelse |
+| Feature | Description |
 |---|---|
-| **Automatisk deteksjon** | Skanner DOM for `.msi`, `.exe`, `.msix`-lenker og kodeblokker |
-| **BFS-crawler** | Crawles leverandørens nettsted (maks 10 sider) med retry og rate-limiting |
-| **Regex-analyse** | Utvidet mønstergjenkjenning for msiexec, Inno Setup, NSIS, InstallShield, WiX |
-| **AI-analyse** | Valgfri analyse via Claude, OpenAI, Google Gemini eller Mistral — med OAuth-støtte |
-| **ZIP-pakke** | Genererer komplett Intune-pakke med Install/Uninstall/Detection PS1-skript |
-| **En-klikk kopier** | Alle kommandoer har direkte kopieringsknapp |
-| **Mørkt tema** | 400px popup med moderne dark UI og state machine |
-| **Options-side** | Provider-kort med toggle, modellvelger, API-nøkkel og OAuth per leverandør |
+| **Auto-detection** | Scans the DOM for `.msi`, `.exe`, `.msix` links and code blocks |
+| **BFS crawler** | Crawls the vendor website (up to 10 pages) with retry and rate-limiting |
+| **Regex analysis** | Extended pattern matching for msiexec, Inno Setup, NSIS, InstallShield, WiX |
+| **AI analysis** | Optional analysis via Claude, OpenAI, Google Gemini or Mistral — with OAuth support |
+| **ZIP package** | Generates a complete Intune package with Install/Uninstall/Detection PS1 scripts |
+| **One-click copy** | All commands have a direct copy button |
+| **Dark theme** | 400px popup with modern dark UI and state machine |
+| **Options page** | Provider cards with toggle, model selector, API key and OAuth per provider |
 
 ---
 
-## Prosjektstruktur
+## Project Structure
 
 ```
 intune-packager/
 ├── extension/                    ← Chrome extension (load unpacked)
 │   ├── manifest.json
 │   ├── background/
-│   │   └── service-worker.js     Tab-state og meldingshåndtering
+│   │   └── service-worker.js     Tab state and message handling
 │   ├── content/
-│   │   └── detector.js           DOM-skanner for installere
+│   │   └── detector.js           DOM scanner for installers
 │   ├── popup/
-│   │   ├── popup.html            400px mørk UI
-│   │   ├── popup.css             Design tokens + state-klasser
+│   │   ├── popup.html            400px dark UI
+│   │   ├── popup.css             Design tokens + state classes
 │   │   └── popup.js              5-state machine (idle/scanning/results/detail/error)
 │   ├── options/
-│   │   ├── options.html          Innstillingside
+│   │   ├── options.html          Settings page with provider cards
 │   │   ├── options.css
 │   │   └── options.js
 │   └── assets/icons/
 │       ├── icon16.png
 │       ├── icon48.png
 │       ├── icon128.png
-│       └── generate-icons.js     Regenerer ikoner: node generate-icons.js
+│       └── generate-icons.js     Regenerate icons: node generate-icons.js
 │
 └── backend/                      ← Node.js Express server
     ├── package.json
-    ├── server.js                 Inngangspunkt, port 3001
+    ├── server.js                 Entry point, port 3001
     └── src/
         ├── routes/
         │   ├── health.js         GET  /health
@@ -138,38 +138,38 @@ intune-packager/
         │   └── generate-package.js POST /api/generate-package
         ├── services/
         │   ├── crawler/
-        │   │   ├── index.js      BFS-orchestrator (maks 10 sider)
+        │   │   ├── index.js      BFS orchestrator (max 10 pages)
         │   │   └── fetcher.js    HTTP + retry + rate-limiting
         │   ├── analyzer/
-        │   │   ├── index.js      Velger AI eller regex, merger resultater
-        │   │   ├── ai-analyzer.js  Tynn shim → delegerer til ai-providers/
-        │   │   └── regex-analyzer.js  Utvidede regex-mønstre
+        │   │   ├── index.js      Selects AI or regex, merges results
+        │   │   ├── ai-analyzer.js  Thin shim → delegates to ai-providers/
+        │   │   └── regex-analyzer.js  Extended regex patterns
         │   ├── ai-providers/
-        │   │   ├── index.js      Registry + dispatcher (felles prompt/parser)
-        │   │   ├── anthropic.js  Claude-adapter
-        │   │   ├── openai.js     OpenAI-adapter (API-nøkkel + OAuth)
-        │   │   ├── gemini.js     Gemini-adapter (API-nøkkel + OAuth)
-        │   │   └── mistral.js    Mistral-adapter (OpenAI-kompatibelt format)
+        │   │   ├── index.js      Registry + dispatcher (shared prompt/parser)
+        │   │   ├── anthropic.js  Claude adapter
+        │   │   ├── openai.js     OpenAI adapter (API key + OAuth)
+        │   │   ├── gemini.js     Gemini adapter (API key + OAuth)
+        │   │   └── mistral.js    Mistral adapter (OpenAI-compatible format)
         │   └── packager/
-        │       ├── index.js      ZIP-generering med archiver
+        │       ├── index.js      ZIP generation with archiver
         │       └── templates/
         │           ├── Install.ps1
         │           ├── Uninstall.ps1
         │           └── Detection.ps1
         └── middleware/
-            └── error-handler.js  Konsistent JSON-feilformat
+            └── error-handler.js  Consistent JSON error format
 ```
 
 ---
 
-## Kom i gang
+## Getting Started
 
-### Krav
+### Requirements
 - Node.js 18+
 - Chrome / Chromium
-- (Valgfritt) API-nøkkel fra [Anthropic](https://console.anthropic.com) eller [OpenAI](https://platform.openai.com)
+- (Optional) API key from [Anthropic](https://console.anthropic.com), [OpenAI](https://platform.openai.com), [Google AI Studio](https://aistudio.google.com) or [Mistral](https://console.mistral.ai)
 
-### 1 — Start backend
+### 1 — Start the backend
 
 ```bash
 cd backend
@@ -178,46 +178,46 @@ npm start
 # → http://localhost:3001/health
 ```
 
-Verifiser at den kjører:
+Verify it's running:
 ```bash
 curl http://localhost:3001/health
-# {"status":"ok","version":"1.0.0","aiProvider":"none",...}
+# {"status":"ok","version":"1.0.0",...}
 ```
 
-### 2 — Last inn extension
+### 2 — Load the extension
 
-1. Åpne Chrome og gå til `chrome://extensions/`
-2. Aktiver **Developer mode** (øverst til høyre)
-3. Klikk **Load unpacked**
-4. Velg mappen `extension/` i dette repoet
-5. Extension-ikonet dukker opp i verktøylinjen
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked**
+4. Select the `extension/` folder in this repo
+5. The extension icon appears in the toolbar
 
-### 3 — Verifiser tilkobling
+### 3 — Verify connection
 
-Klikk på extension-ikonet. Headeren skal vise `● Tilkoblet`. Grønn dot = backend er oppe.
+Click the extension icon. The header should show `● Connected`. Green dot = backend is up.
 
 ---
 
-## Bruk
+## Usage
 
-1. Gå til en leverandørside, f.eks. `zoom.us/download`, `7-zip.org`, `code.visualstudio.com/download`
-2. Klikk extension-ikonet → **Scan siden**
-3. Extension-en skanner siden, crawles leverandørdomenet og analyserer installere
-4. Klikk på et installer-kort for detaljvisning
-5. Kopier install/uninstall-kommandoer eller detection rule med ett klikk
-6. Klikk **Last ned pakke (ZIP)** for å laste ned ferdig Intune-pakke
+1. Go to a vendor page, e.g. `zoom.us/download`, `7-zip.org`, `code.visualstudio.com/download`
+2. Click the extension icon → **Scan page**
+3. The extension scans the page, crawls the vendor domain and analyzes installers
+4. Click an installer card for the detail view
+5. Copy install/uninstall commands or detection rule with one click
+6. Click **Download package (ZIP)** to download the complete Intune package
 
-### Generert ZIP-innhold
+### Generated ZIP contents
 
-| Fil | Beskrivelse |
+| File | Description |
 |---|---|
-| `Install.ps1` | Silent install med exit-kode-håndtering og logging |
-| `Uninstall.ps1` | Silent uninstall med cleanup |
-| `Detection.ps1` | Intune detection rule (exit 0 = installert, exit 1 = ikke installert) |
-| `metadata.json` | App-info, versjon, kilde-URL, Intune-innstillinger |
-| `README.txt` | Instruksjoner, verifiseringssjekkliste |
+| `Install.ps1` | Silent install with exit code handling and logging |
+| `Uninstall.ps1` | Silent uninstall with cleanup |
+| `Detection.ps1` | Intune detection rule (exit 0 = installed, exit 1 = not installed) |
+| `metadata.json` | App info, version, source URL, Intune settings |
+| `README.txt` | Instructions and manual verification checklist |
 
-### Intune-oppsett (Win32-app)
+### Intune setup (Win32 app)
 
 ```
 Install command:   powershell.exe -ExecutionPolicy Bypass -File Install.ps1
@@ -227,44 +227,44 @@ Detection rule:    Custom script: Detection.ps1
 
 ---
 
-## AI-analyse (valgfritt)
+## AI Analysis (optional)
 
-Gå til ⚙ **Innstillinger** i extension-popupen.
+Open ⚙ **Settings** from the extension popup.
 
-### Støttede leverandører
+### Supported providers
 
-| Leverandør | Auth | Modeller |
+| Provider | Auth | Models |
 |---|---|---|
-| **Claude** (Anthropic) | API-nøkkel | Opus 4.6, Sonnet 4.6, Haiku 4.5 |
-| **OpenAI** | API-nøkkel eller OAuth | GPT-4o, GPT-4o mini, GPT-4 Turbo, o1, o3, o3-mini |
-| **Google Gemini** | API-nøkkel eller OAuth | Gemini 2.0 Flash, Gemini 1.5 Pro, Gemini 2.0 Pro (exp) |
-| **Mistral** | API-nøkkel | Mistral Large, Mistral Medium, Codestral |
+| **Claude** (Anthropic) | API key | Opus 4.6, Sonnet 4.6, Haiku 4.5 |
+| **OpenAI** | API key or OAuth | GPT-4o, GPT-4o mini, GPT-4 Turbo, o1, o3, o3-mini |
+| **Google Gemini** | API key or OAuth | Gemini 2.0 Flash, Gemini 1.5 Pro, Gemini 2.0 Pro (exp) |
+| **Mistral** | API key | Mistral Large, Mistral Medium, Codestral |
 
-### Oppsett
+### Setup
 
-1. Åpne **Innstillinger** (⚙-ikonet i popup-headeren)
-2. Velg **Aktiv leverandør** øverst
-3. Klikk på provider-kortet og slå på toggle
-4. Velg ønsket **modell** fra nedtrekkslisten
-5. Fyll inn **API-nøkkel** — eller bruk **OAuth** (Gemini / OpenAI)
-6. Klikk **Test** for å verifisere tilkoblingen
-7. Lagre innstillinger
+1. Open **Settings** (⚙ icon in the popup header)
+2. Select the **Active provider** at the top
+3. Click the provider card and enable the toggle
+4. Choose the desired **model** from the dropdown
+5. Enter an **API key** — or use **OAuth** (Gemini / OpenAI)
+6. Click **Test** to verify the connection
+7. Save settings
 
-### OAuth-flyt (Gemini og OpenAI)
+### OAuth flow (Gemini and OpenAI)
 
-1. Fyll inn **Client ID** fra din Google Cloud / OpenAI-applikasjon
-2. Klikk **Koble til Google / Koble til OpenAI**
-3. Fullfør autentisering i popup-vinduet som åpner seg
-4. Token lagres automatisk med utløpstidspunkt
+1. Enter the **Client ID** from your Google Cloud / OpenAI application
+2. Click **Connect to Google** / **Connect to OpenAI**
+3. Complete authentication in the popup window that opens
+4. The token is stored automatically with an expiry timestamp
 
-### Analysemodus
+### Analysis mode
 
-| Modus | Beskrivelse |
+| Mode | Description |
 |---|---|
-| **AI-first** | AI analyserer teksten, regex brukes som fallback (anbefalt) |
-| **Kun regex** | Ingen API-kall, rask og gratis |
+| **AI-first** | AI analyzes the text, regex used as fallback (recommended) |
+| **Regex only** | No API calls, fast and free |
 
-Uten gyldig nøkkel/token faller extension automatisk tilbake til regex-analyse.
+Without a valid key/token the extension automatically falls back to regex analysis.
 
 ---
 
@@ -276,7 +276,6 @@ Uten gyldig nøkkel/token faller extension automatisk tilbake til regex-analyse.
 {
   "status": "ok",
   "version": "1.0.0",
-  "aiProvider": "none",
   "timestamp": "2026-03-03T08:00:00.000Z"
 }
 ```
@@ -293,12 +292,12 @@ Uten gyldig nøkkel/token faller extension automatisk tilbake til regex-analyse.
 }
 ```
 
-**Headers (valgfritt):**
+**Headers (optional):**
 ```
 x-ai-provider:  claude | openai | gemini | mistral | none
 x-ai-model:     claude-sonnet-4-6 | gpt-4o | gemini-2.0-flash | mistral-large-latest
-x-ai-key:       API-nøkkel (hvis authType=apikey)
-x-ai-oauth:     OAuth access token (hvis authType=oauth)
+x-ai-key:       API key (if authType=apikey)
+x-ai-oauth:     OAuth access token (if authType=oauth)
 x-analyze-mode: ai-first | regex-only
 ```
 
@@ -315,68 +314,70 @@ x-analyze-mode: ai-first | regex-only
   "confidence": 85,
   "guid": "{D1F6243A-...}",
   "aiUsed": true,
+  "aiProvider": "claude",
+  "aiModel": "claude-sonnet-4-6",
   "pagesCrawled": 4
 }
 ```
 
 ### `POST /api/generate-package`
 
-Sender inn hele analyse-resultatet (fra `/api/analyze`) og mottar en ZIP-fil.
+Send the full analysis result (from `/api/analyze`) and receive a ZIP file.
 
 ```bash
 curl -X POST http://localhost:3001/api/generate-package \
   -H "Content-Type: application/json" \
-  -d @analyse-result.json \
-  --output pakke.zip
+  -d @analysis-result.json \
+  --output package.zip
 ```
 
 ---
 
-## Analyse-detaljer
+## Analysis Details
 
-### Regex-mønstre
+### Regex patterns
 
-Regex-analyzeren dekker:
+The regex analyzer covers:
 
-- **msiexec** — alle flaggkombinasjoner (`/i`, `/quiet`, `/qn`, `/norestart`, logging)
-- **GUID/ProductCode** — `{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}` fra alle kontekster
-- **EXE-rammeverk** — Inno Setup, NSIS, InstallShield, WiX, Advanced Installer
-- **Registry-stier** — `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\...`
-- **Fil-stier** — `%ProgramFiles%`, `C:\Program Files\...`
-- **Versjonsnummer** — fra filnavn og dokumentasjonstekst
+- **msiexec** — all flag combinations (`/i`, `/quiet`, `/qn`, `/norestart`, logging)
+- **GUID/ProductCode** — `{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}` from all contexts
+- **EXE frameworks** — Inno Setup, NSIS, InstallShield, WiX, Advanced Installer
+- **Registry paths** — `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\...`
+- **File paths** — `%ProgramFiles%`, `C:\Program Files\...`
+- **Version numbers** — from filename and documentation text
 
-### Konfidensscoring
+### Confidence scoring
 
-| Poeng | Kilde |
+| Points | Source |
 |---|---|
-| +30 | GUID/ProductCode funnet |
-| +15 | MSI/MSIX-type |
-| +10 | EXE-rammeverk identifisert |
-| +8  | `/quiet`-flagg i install-kommando |
-| +5  | `/norestart`-flagg |
-| +7  | `msiexec`-kommando |
+| +30 | GUID/ProductCode found |
+| +15 | MSI/MSIX type |
+| +10 | EXE framework identified |
+| +8  | `/quiet` flag in install command |
+| +5  | `/norestart` flag |
+| +7  | `msiexec` command |
 | +10 | Uninstall via GUID |
 | +5  | Detection via `Test-Path` |
 
 ---
 
-## Utvikling
+## Development
 
-### Dev-modus backend
+### Backend dev mode
 
 ```bash
 cd backend
-npm run dev    # node --watch (auto-restart ved endringer)
+npm run dev    # node --watch (auto-restart on changes)
 ```
 
-### Regenerer ikoner
+### Regenerate icons
 
 ```bash
 cd extension/assets/icons
 node generate-icons.js
 ```
 
-### Kjør en lokal analyse
+### Run a local analysis
 
 ```bash
 curl -X POST http://localhost:3001/api/analyze \
@@ -391,36 +392,37 @@ curl -X POST http://localhost:3001/api/analyze \
 
 ---
 
-## Feilsøking
+## Troubleshooting
 
-| Problem | Løsning |
+| Problem | Solution |
 |---|---|
-| Rød dot i popup | Start backend: `cd backend && npm start` |
-| "Ingen installere funnet" | Siden har kanskje JavaScript-rendret nedlastingslenker. Backend crawlen vil likevel analysere URL-en. |
-| Lav konfidens | Leverandørsiden mangler dokumentasjon. Bruk AI-modus for bedre resultat. |
-| AI-analyse feiler | Sjekk at API-nøkkelen er korrekt i innstillinger. Extension faller automatisk tilbake til regex. |
-| CORS-feil | Sjekk at backend kjører på riktig port (standard: 3001) |
+| Red dot in popup | Start the backend: `cd backend && npm start` |
+| "No installers found" | The page may use JavaScript-rendered download links. The backend crawler will still analyze the URL. |
+| Low confidence | The vendor page lacks documentation. Use AI mode for better results. |
+| AI analysis fails | Check that the API key is correct in settings. The extension automatically falls back to regex. |
+| OAuth token expired | Re-authenticate in Settings — click the connect button again. |
+| CORS error | Check that the backend is running on the correct port (default: 3001) |
 
-**Backend-logg:**
+**Backend log:**
 ```
 GET /health 200 - 2.3 ms
-[analyze] ZoomInstallerFull.msi (msi) from https://zoom.us/download
+[analyze] ZoomInstallerFull.msi (msi) from https://zoom.us/download — claude/claude-sonnet-4-6
 [analyze] crawled 4 pages, 18432 chars
 ```
 
-**Intune Management Extension-logg (på klient):**
+**Intune Management Extension log (on client):**
 ```
 C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\IntuneManagementExtension.log
 ```
 
 ---
 
-## Bidrag
+## Contributing
 
-Pull requests mottas med takk. Åpne gjerne en issue for bugs eller forslag.
+Pull requests are welcome. Feel free to open an issue for bugs or feature requests.
 
 ---
 
-## Lisens
+## License
 
 MIT

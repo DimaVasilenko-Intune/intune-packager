@@ -407,7 +407,7 @@ NODE_ENV=production CORS_ORIGINS=https://your-domain.com npm start
 cd backend
 set NODE_ENV=production
 set CORS_ORIGINS=https://your-domain.com
-npm run start:win
+npm run start:prod
 ```
 
 | Environment Variable | Description | Default |

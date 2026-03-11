@@ -160,7 +160,7 @@ function buildInstallArgs(installCmd, filename, type) {
 function buildUninstallScript(uninstall, guid, type) {
   if (!uninstall) {
     if (guid) return `$proc = Start-Process msiexec.exe -ArgumentList '/x "${guid}" /quiet /norestart' -Wait -PassThru`;
-    return `# TODO: Add uninstall command\n    Write-Log "Uninstall command not available"`;
+    return `# NOTE: No uninstall command was detected. Add the correct uninstall command below.\n    Write-Log "Uninstall command not available — please update this script manually"`;
   }
 
   if (uninstall.toLowerCase().includes('msiexec')) {
@@ -218,7 +218,7 @@ function buildReadme(appName, filename, type, install, uninstall, detection, sou
     `------------`,
     `App type:         Windows app (Win32)`,
     `Install command:  powershell.exe -ExecutionPolicy Bypass -File Install.ps1`,
-    `Uninstall command:powershell.exe -ExecutionPolicy Bypass -File Uninstall.ps1`,
+    `Uninstall command: powershell.exe -ExecutionPolicy Bypass -File Uninstall.ps1`,
     `Detection rule:   Use custom script: Detection.ps1`,
     ``,
     `INSTALL COMMAND (raw)`,

@@ -1,5 +1,9 @@
 'use strict';
 
+if (window._intuneDetectorLoaded) { /* already injected */ }
+else {
+window._intuneDetectorLoaded = true;
+
 /**
  * Content script — Detector
  * Scans the current page DOM for installer download links.
@@ -137,3 +141,5 @@ function extractNearbySize(el) {
   const m = text.match(/(\d+(?:\.\d+)?)\s*(MB|KB|GB)/i);
   return m ? `${m[1]} ${m[2].toUpperCase()}` : null;
 }
+
+} // end duplicate-injection guard

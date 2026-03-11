@@ -1,0 +1,27 @@
+{
+  "name": "intune-packager-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Intune Packager Chrome Extension",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "scripts": {
+    "start": "NODE_ENV=production node server.js",
+    "start:win": "set NODE_ENV=production&& node server.js",
+    "dev": "node --watch server.js",
+    "audit": "npm audit --production"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.0"
+  }
+}

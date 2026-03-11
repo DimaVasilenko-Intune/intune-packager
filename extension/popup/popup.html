@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intune Packager</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- Header — always visible -->
+  <header class="header">
+    <div class="header-brand">
+      <img src="../assets/icons/icon48.png" alt="" class="brand-icon" onerror="this.style.display='none'">
+      <span class="brand-name">Intune Packager</span>
+    </div>
+    <div class="header-right">
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span class="status-text" id="status-text">Sjekker...</span>
+      </div>
+      <button class="icon-btn" id="settings-btn" title="Innstillinger">⚙</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main id="main">
+
+    <!-- ─── State: idle ─── -->
+    <div class="state" id="state-idle">
+      <div class="center-content">
+        <div class="idle-icon">📦</div>
+        <p class="idle-text">Klikk Scan for å analysere<br>installere på denne siden</p>
+        <button class="btn btn-primary btn-wide" id="scan-btn-idle">
+          <span class="btn-icon">🔍</span> Scan siden
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── State: scanning ─── -->
+    <div class="state hidden" id="state-scanning">
+      <div class="scanning-content">
+        <div class="progress-steps" id="progress-steps">
+          <div class="progress-step active" id="step-1">
+            <div class="step-dot"></div>
+            <div class="step-info">
+              <span class="step-label">Skanner siden</span>
+              <span class="step-desc" id="step-1-desc">Leter etter installere...</span>
+            </div>
+          </div>
+          <div class="progress-step" id="step-2">
+            <div class="step-dot"></div>
+            <div class="step-info">
+              <span class="step-label">Crawler leverandørside</span>
+              <span class="step-desc" id="step-2-desc">Venter</span>
+            </div>
+          </div>
+          <div class="progress-step" id="step-3">
+            <div class="step-dot"></div>
+            <div class="step-info">
+              <span class="step-label">Analyserer installere</span>
+              <span class="step-desc" id="step-3-desc">Venter</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="cancel-btn">Avbryt</button>
+      </div>
+    </div>
+
+    <!-- ─── State: results ─── -->
+    <div class="state hidden" id="state-results">
+      <div class="results-toolbar">
+        <span class="results-count" id="results-count"></span>
+        <button class="btn btn-ghost btn-sm" id="rescan-btn">🔄 Scan på nytt</button>
+      </div>
+      <div class="installer-list" id="installer-list">
+        <!-- Installer cards injected by popup.js -->
+      </div>
+    </div>
+
+    <!-- ─── State: detail ─── -->
+    <div class="state hidden" id="state-detail">
+      <div class="detail-nav">
+        <button class="btn btn-ghost btn-sm" id="back-btn">← Tilbake</button>
+        <div id="detail-badges" class="badge-row"></div>
+      </div>
+
+      <div class="detail-title-block">
+        <div class="detail-filename" id="detail-filename"></div>
+        <div class="detail-meta" id="detail-meta"></div>
+      </div>
+
+      <div class="confidence-block">
+        <div class="confidence-row">
+          <span class="label-sm">Konfidensgrad</span>
+          <span class="confidence-pct" id="confidence-pct">—</span>
+        </div>
+        <div class="confidence-bar">
+          <div class="confidence-fill" id="confidence-fill"></div>
+        </div>
+        <div class="ai-badge hidden" id="ai-badge">✨ AI-assistert</div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="cmd-label">Installer-kommando</div>
+        <div class="code-block">
+          <code id="install-cmd" class="cmd-code"></code>
+          <button class="copy-btn" data-target="install-cmd" title="Kopier">⧉</button>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="cmd-label">Avinstaller-kommando</div>
+        <div class="code-block">
+          <code id="uninstall-cmd" class="cmd-code"></code>
+          <button class="copy-btn" data-target="uninstall-cmd" title="Kopier">⧉</button>
+        </div>
+      </div>
+
+      <div class="cmd-section">
+        <div class="cmd-label">Detection rule (PowerShell)</div>
+        <div class="code-block code-block-tall">
+          <code id="detection-rule" class="cmd-code"></code>
+          <button class="copy-btn" data-target="detection-rule" title="Kopier">⧉</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-wide" id="download-btn">
+        ⬇ Last ned pakke (ZIP)
+      </button>
+    </div>
+
+    <!-- ─── State: error ─── -->
+    <div class="state hidden" id="state-error">
+      <div class="center-content">
+        <div class="error-icon">⚠</div>
+        <p class="error-message" id="error-message">En feil oppstod</p>
+        <button class="btn btn-danger" id="retry-btn">🔄 Prøv igjen</button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

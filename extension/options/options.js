@@ -52,23 +52,23 @@ async function testBackend() {
   const btn    = document.getElementById('test-backend');
 
   btn.disabled = true;
-  btn.textContent = 'Tester...';
+  btn.textContent = 'Testing...';
   msgEl.className = 'status-msg hidden';
 
   try {
     const res  = await fetchTimeout(`${url}/health`, {}, 5000);
     if (!res.ok) {
-      showMsg(msgEl, 'error', `Backend svarte med HTTP ${res.status}`);
+      showMsg(msgEl, 'error', `Backend responded with HTTP ${res.status}`);
       return;
     }
     const data = await res.json();
     if (data.status === 'ok') {
-      showMsg(msgEl, 'success', `✓ Tilkoblet — backend v${data.version || '?'}, AI: ${data.aiProvider || 'none'}`);
+      showMsg(msgEl, 'success', `✓ Connected — backend v${data.version || '?'}, AI: ${data.aiProvider || 'none'}`);
     } else {
-      showMsg(msgEl, 'error', `Backend svarte med feil status`);
+      showMsg(msgEl, 'error', `Backend responded with error status`);
     }
   } catch (err) {
-    showMsg(msgEl, 'error', `Tilkobling feilet: ${err.message}`);
+    showMsg(msgEl, 'error', `Connection failed: ${err.message}`);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Test';
@@ -82,7 +82,7 @@ async function updateAbout() {
 }
 
 function updateAboutAI(provider) {
-  const labels = { none: 'Ingen (kun regex)', claude: 'Claude (Haiku)', openai: 'OpenAI (GPT-4o mini)' };
+  const labels = { none: 'None (regex only)', claude: 'Claude (Haiku)', openai: 'OpenAI (GPT-4o mini)' };
   document.getElementById('about-ai').textContent = labels[provider] || provider;
 }
 

@@ -2,24 +2,24 @@
 
 const axios = require('axios');
 
-const SYSTEM_PROMPT = `Du er en Intune-pakking-ekspert. Analyser dokumentasjonsteksten og ekstraher:
-1. Silent install-kommando (komplett, klar til bruk)
-2. Silent uninstall-kommando (komplett, klar til bruk)
-3. Detection rule som PowerShell-snippet (exit 0 = funnet, exit 1 = ikke funnet)
+const SYSTEM_PROMPT = `You are an Intune packaging expert. Analyze the documentation text and extract:
+1. Silent install command (complete, ready to use)
+2. Silent uninstall command (complete, ready to use)
+3. Detection rule as PowerShell snippet (exit 0 = found, exit 1 = not found)
 
-Retningslinjer:
-- For MSI: bruk msiexec.exe /i "{{filename}}" /quiet /norestart
-- For EXE: finn riktige silent switches fra teksten
-- For detection: foretrekk GUID/ProductCode → registry-sti → fil-sti
-- Returner ALLTID gyldig JSON, ingen markdown
+Guidelines:
+- For MSI: use msiexec.exe /i "{{filename}}" /quiet /norestart
+- For EXE: find the correct silent switches from the text
+- For detection: prefer GUID/ProductCode → registry path → file path
+- ALWAYS return valid JSON, no markdown
 
-Svar kun med dette JSON-skjemaet:
+Respond only with this JSON schema:
 {
   "install": "...",
   "uninstall": "...",
   "detection": "...",
   "confidence": <int 0-100>,
-  "notes": "kort forklaring på norsk"
+  "notes": "brief explanation"
 }`;
 
 /**
@@ -85,10 +85,10 @@ async function analyzeWithOpenAI({ text, filename, type, apiKey }) {
 function buildUserPrompt(text, filename, type) {
   const truncated = text.slice(0, 8000); // stay within token budget
   return [
-    `Filnavn: ${filename}`,
-    `Installer-type: ${type?.toUpperCase() || 'UKJENT'}`,
+    `Filename: ${filename}`,
+    `Installer type: ${type?.toUpperCase() || 'UNKNOWN'}`,
     ``,
-    `Dokumentasjonstekst:`,
+    `Documentation text:`,
     `---`,
     truncated,
     `---`,

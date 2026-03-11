@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,9 +17,9 @@
     <div class="header-right">
       <div class="status-badge" id="status-badge">
         <span class="status-dot" id="status-dot"></span>
-        <span class="status-text" id="status-text">Sjekker...</span>
+        <span class="status-text" id="status-text">Checking...</span>
       </div>
-      <button class="icon-btn" id="settings-btn" title="Innstillinger">⚙</button>
+      <button class="icon-btn" id="settings-btn" title="Settings">⚙</button>
     </div>
   </header>
 
@@ -30,9 +30,9 @@
     <div class="state" id="state-idle">
       <div class="center-content">
         <div class="idle-icon">📦</div>
-        <p class="idle-text">Klikk Scan for å analysere<br>installere på denne siden</p>
+        <p class="idle-text">Click Scan to analyze<br>installers on this page</p>
         <button class="btn btn-primary btn-wide" id="scan-btn-idle">
-          <span class="btn-icon">🔍</span> Scan siden
+          <span class="btn-icon">🔍</span> Scan page
         </button>
       </div>
     </div>
@@ -44,26 +44,26 @@
           <div class="progress-step active" id="step-1">
             <div class="step-dot"></div>
             <div class="step-info">
-              <span class="step-label">Skanner siden</span>
-              <span class="step-desc" id="step-1-desc">Leter etter installere...</span>
+              <span class="step-label">Scanning page</span>
+              <span class="step-desc" id="step-1-desc">Looking for installers...</span>
             </div>
           </div>
           <div class="progress-step" id="step-2">
             <div class="step-dot"></div>
             <div class="step-info">
-              <span class="step-label">Crawler leverandørside</span>
-              <span class="step-desc" id="step-2-desc">Venter</span>
+              <span class="step-label">Crawling vendor site</span>
+              <span class="step-desc" id="step-2-desc">Waiting</span>
             </div>
           </div>
           <div class="progress-step" id="step-3">
             <div class="step-dot"></div>
             <div class="step-info">
-              <span class="step-label">Analyserer installere</span>
-              <span class="step-desc" id="step-3-desc">Venter</span>
+              <span class="step-label">Analyzing installers</span>
+              <span class="step-desc" id="step-3-desc">Waiting</span>
             </div>
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" id="cancel-btn">Avbryt</button>
+        <button class="btn btn-ghost btn-sm" id="cancel-btn">Cancel</button>
       </div>
     </div>
 
@@ -71,7 +71,7 @@
     <div class="state hidden" id="state-results">
       <div class="results-toolbar">
         <span class="results-count" id="results-count"></span>
-        <button class="btn btn-ghost btn-sm" id="rescan-btn">🔄 Scan på nytt</button>
+        <button class="btn btn-ghost btn-sm" id="rescan-btn">🔄 Rescan</button>
       </div>
       <div class="installer-list" id="installer-list">
         <!-- Installer cards injected by popup.js -->
@@ -81,7 +81,7 @@
     <!-- ─── State: detail ─── -->
     <div class="state hidden" id="state-detail">
       <div class="detail-nav">
-        <button class="btn btn-ghost btn-sm" id="back-btn">← Tilbake</button>
+        <button class="btn btn-ghost btn-sm" id="back-btn">← Back</button>
         <div id="detail-badges" class="badge-row"></div>
       </div>
 
@@ -92,28 +92,28 @@
 
       <div class="confidence-block">
         <div class="confidence-row">
-          <span class="label-sm">Konfidensgrad</span>
+          <span class="label-sm">Confidence</span>
           <span class="confidence-pct" id="confidence-pct">—</span>
         </div>
         <div class="confidence-bar">
           <div class="confidence-fill" id="confidence-fill"></div>
         </div>
-        <div class="ai-badge hidden" id="ai-badge">✨ AI-assistert</div>
+        <div class="ai-badge hidden" id="ai-badge">✨ AI-assisted</div>
       </div>
 
       <div class="cmd-section">
-        <div class="cmd-label">Installer-kommando</div>
+        <div class="cmd-label">Install command</div>
         <div class="code-block">
           <code id="install-cmd" class="cmd-code"></code>
-          <button class="copy-btn" data-target="install-cmd" title="Kopier">⧉</button>
+          <button class="copy-btn" data-target="install-cmd" title="Copy">⧉</button>
         </div>
       </div>
 
       <div class="cmd-section">
-        <div class="cmd-label">Avinstaller-kommando</div>
+        <div class="cmd-label">Uninstall command</div>
         <div class="code-block">
           <code id="uninstall-cmd" class="cmd-code"></code>
-          <button class="copy-btn" data-target="uninstall-cmd" title="Kopier">⧉</button>
+          <button class="copy-btn" data-target="uninstall-cmd" title="Copy">⧉</button>
         </div>
       </div>
 
@@ -121,12 +121,12 @@
         <div class="cmd-label">Detection rule (PowerShell)</div>
         <div class="code-block code-block-tall">
           <code id="detection-rule" class="cmd-code"></code>
-          <button class="copy-btn" data-target="detection-rule" title="Kopier">⧉</button>
+          <button class="copy-btn" data-target="detection-rule" title="Copy">⧉</button>
         </div>
       </div>
 
       <button class="btn btn-primary btn-wide" id="download-btn">
-        ⬇ Last ned pakke (ZIP)
+        ⬇ Download package (ZIP)
       </button>
     </div>
 
@@ -134,8 +134,8 @@
     <div class="state hidden" id="state-error">
       <div class="center-content">
         <div class="error-icon">⚠</div>
-        <p class="error-message" id="error-message">En feil oppstod</p>
-        <button class="btn btn-danger" id="retry-btn">🔄 Prøv igjen</button>
+        <p class="error-message" id="error-message">An error occurred</p>
+        <button class="btn btn-danger" id="retry-btn">🔄 Try again</button>
       </div>
     </div>
 

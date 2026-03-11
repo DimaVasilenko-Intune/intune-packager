@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Intune Packager — Innstillinger</title>
+  <title>Intune Packager — Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
@@ -13,35 +13,35 @@
       <img src="../assets/icons/icon48.png" alt="" class="logo" onerror="this.style.display='none'">
       <div>
         <h1>Intune Packager</h1>
-        <p class="subtitle">Innstillinger</p>
+        <p class="subtitle">Settings</p>
       </div>
     </header>
 
     <main class="page-main">
 
-      <!-- ── Backend-seksjon ── -->
+      <!-- ── Backend section ── -->
       <section class="section">
         <h2 class="section-title">Backend</h2>
         <div class="field">
-          <label class="field-label" for="backend-url">Server-URL</label>
+          <label class="field-label" for="backend-url">Server URL</label>
           <div class="input-row">
             <input type="url" id="backend-url" class="input" placeholder="http://localhost:3001" value="http://localhost:3001">
             <button class="btn btn-secondary" id="test-backend">Test</button>
           </div>
-          <span class="field-hint">Lokal Express-server som håndterer crawling og analyse</span>
+          <span class="field-hint">Local Express server that handles crawling and analysis</span>
         </div>
         <div id="backend-status" class="status-msg hidden"></div>
       </section>
 
-      <!-- ── AI-analyse ── -->
+      <!-- ── AI analysis ── -->
       <section class="section">
-        <h2 class="section-title">AI-analyse</h2>
+        <h2 class="section-title">AI Analysis</h2>
         <div class="field">
-          <label class="field-label">AI-leverandør</label>
+          <label class="field-label">AI Provider</label>
           <div class="radio-group">
             <label class="radio-label">
               <input type="radio" name="ai-provider" value="none" checked>
-              <span>Ingen AI — kun regex</span>
+              <span>No AI — regex only</span>
             </label>
             <label class="radio-label">
               <input type="radio" name="ai-provider" value="openai">
@@ -55,39 +55,39 @@
         </div>
 
         <div class="field" id="api-key-field" style="display:none">
-          <label class="field-label" for="api-key">API-nøkkel</label>
+          <label class="field-label" for="api-key">API Key</label>
           <div class="input-row">
             <input type="password" id="api-key" class="input" placeholder="sk-...  /  sk-ant-...">
-            <button class="btn btn-ghost btn-sm" id="toggle-key" title="Vis/skjul">👁</button>
+            <button class="btn btn-ghost btn-sm" id="toggle-key" title="Show/hide">👁</button>
           </div>
-          <span class="field-hint">Lagres lokalt i Chrome — sendes kun til din valgte AI-leverandør</span>
+          <span class="field-hint">Stored locally in Chrome — only sent to your selected AI provider</span>
         </div>
       </section>
 
-      <!-- ── Analysemodus ── -->
+      <!-- ── Analysis mode ── -->
       <section class="section">
-        <h2 class="section-title">Analysemodus</h2>
+        <h2 class="section-title">Analysis Mode</h2>
         <div class="radio-group">
           <label class="radio-label">
             <input type="radio" name="analyze-mode" value="ai-first" checked>
-            <span>AI-first med regex-fallback <em>(anbefalt)</em></span>
+            <span>AI-first with regex fallback <em>(recommended)</em></span>
           </label>
           <label class="radio-label">
             <input type="radio" name="analyze-mode" value="regex-only">
-            <span>Kun regex (raskere, ingen API-kostnad)</span>
+            <span>Regex only (faster, no API cost)</span>
           </label>
         </div>
       </section>
 
-      <!-- ── Lagre-knapp ── -->
+      <!-- ── Save button ── -->
       <div class="actions">
-        <button class="btn btn-primary" id="save-btn">Lagre innstillinger</button>
-        <span class="save-status hidden" id="save-status">✓ Lagret</span>
+        <button class="btn btn-primary" id="save-btn">Save settings</button>
+        <span class="save-status hidden" id="save-status">✓ Saved</span>
       </div>
 
-      <!-- ── Om ── -->
+      <!-- ── About ── -->
       <section class="section section-about">
-        <h2 class="section-title">Om</h2>
+        <h2 class="section-title">About</h2>
         <div class="about-grid">
           <div class="about-row">
             <span class="about-key">Versjon</span>
@@ -98,12 +98,12 @@
             <span class="about-val" id="about-backend">—</span>
           </div>
           <div class="about-row">
-            <span class="about-key">AI-modus</span>
-            <span class="about-val" id="about-ai">Ingen</span>
+            <span class="about-key">AI mode</span>
+            <span class="about-val" id="about-ai">None</span>
           </div>
         </div>
         <p class="about-hint">
-          Backend-kode: <code>cd ~/intune-packager/backend &amp;&amp; npm start</code>
+          Backend: <code>cd ~/intune-packager/backend &amp;&amp; npm start</code>
         </p>
       </section>
 

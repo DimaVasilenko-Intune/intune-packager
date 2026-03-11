@@ -55,7 +55,7 @@ async function loadSettings() {
 
 // ── Backend health check ──────────────────────────────────────────────────────
 async function checkBackend() {
-  setStatus('checking', 'Sjekker...');
+  setStatus('checking', 'Checking...');
   try {
     const res  = await fetchWithTimeout(`${backendUrl}/health`, {
       headers: { 'x-ai-provider': aiProvider },
@@ -63,13 +63,13 @@ async function checkBackend() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.status === 'ok') {
-      const label = aiProvider !== 'none' ? `AI (${aiProvider})` : 'Tilkoblet';
+      const label = aiProvider !== 'none' ? `AI (${aiProvider})` : 'Connected';
       setStatus('connected', label);
     } else {
-      setStatus('disconnected', 'Feil');
+      setStatus('disconnected', 'Error');
     }
   } catch {
-    setStatus('disconnected', 'Frakoblet');
+    setStatus('disconnected', 'Disconnected');
   }
 }
 
@@ -100,7 +100,7 @@ async function startScan() {
 
   try {
     // Step 1: scan the active tab via content script
-    activateStep(1, 'Leter etter installere...');
+    activateStep(1, 'Looking for installers...');
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     let detected = [];
@@ -114,7 +114,7 @@ async function startScan() {
 
     if (abortRequested) return;
 
-    completeStep(1, `${detected.length} fil(er) funnet`);
+    completeStep(1, `${detected.length} file(s) found`);
 
     if (!detected.length) {
       // Still analyze the page URL even with no download links detected
@@ -123,9 +123,9 @@ async function startScan() {
 
     // Step 2: crawl + analyze each installer
     activateStep(2, `Crawling ${new URL(tab.url).hostname}...`);
-    completeStep(2, 'Crawling fullført');
+    completeStep(2, 'Crawling complete');
 
-    activateStep(3, `Analyserer ${detected.length} installer(e)...`);
+    activateStep(3, `Analyzing ${detected.length} installer(s)...`);
 
     const results = [];
     for (const item of detected.slice(0, 5)) { // max 5 installers per scan
@@ -140,17 +140,17 @@ async function startScan() {
 
     if (abortRequested) return;
 
-    completeStep(3, `${results.length} analysert`);
+    completeStep(3, `${results.length} analyzed`);
 
     scanResults = results.length ? results : [{
-      filename: extractFilenameFromUrl(tab.url) || 'Ukjent installer',
+      filename: extractFilenameFromUrl(tab.url) || 'Unknown installer',
       type: 'unknown',
       install: '',
       uninstall: '',
       detection: '',
       confidence: 0,
       aiUsed: false,
-      error: 'Ingen installasjonsdetaljer funnet',
+      error: 'No installation details found',
     }];
 
     // Cache in session storage
@@ -161,7 +161,7 @@ async function startScan() {
 
   } catch (err) {
     console.error('[popup] scan error:', err);
-    showError(err.message || 'Scan mislyktes. Sjekk at backend kjører.');
+    showError(err.message || 'Scan failed. Check that the backend is running.');
   }
 }
 
@@ -200,16 +200,16 @@ function renderResults(items) {
   const list  = $('installer-list');
   const count = $('results-count');
 
-  count.textContent = `${items.length} installer${items.length !== 1 ? 'e' : ''} funnet`;
+  count.textContent = `${items.length} installer${items.length !== 1 ? 's' : ''} found`;
   list.innerHTML    = '';
 
   if (!items.length) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     const p1 = document.createElement('p');
-    p1.textContent = 'Ingen installere funnet';
+    p1.textContent = 'No installers found';
     const p2 = document.createElement('p');
-    p2.textContent = 'Prøv en nedlastingsside.';
+    p2.textContent = 'Try a download page.';
     empty.appendChild(p1);
     empty.appendChild(p2);
     list.appendChild(empty);
@@ -229,10 +229,10 @@ function renderResults(items) {
     body.className = 'card-body';
     const fnDiv = document.createElement('div');
     fnDiv.className = 'card-filename';
-    fnDiv.textContent = item.filename || 'Ukjent';
+    fnDiv.textContent = item.filename || 'Unknown';
     const metaDiv = document.createElement('div');
     metaDiv.className = 'card-meta';
-    metaDiv.textContent = [item.version ? `v${item.version}` : '', item.size || '', 'Funnet på siden'].filter(Boolean).join(' · ');
+    metaDiv.textContent = [item.version ? `v${item.version}` : '', item.size || '', 'Found on page'].filter(Boolean).join(' · ');
     body.appendChild(fnDiv);
     body.appendChild(metaDiv);
 
@@ -266,7 +266,7 @@ function showDetail(idx) {
   badges.appendChild(typeBadge);
   badges.appendChild(confBadge);
 
-  $('detail-filename').textContent = d.filename || 'Ukjent installer';
+  $('detail-filename').textContent = d.filename || 'Unknown installer';
   $('detail-meta').textContent = [
     d.version ? `v${d.version}` : null,
     d.size    ? d.size          : null,
@@ -285,9 +285,9 @@ function showDetail(idx) {
   else          { aiBadge.classList.add('hidden');    }
 
   // Commands
-  $('install-cmd').textContent   = d.install    || '(ikke tilgjengelig)';
-  $('uninstall-cmd').textContent = d.uninstall  || '(ikke tilgjengelig)';
-  $('detection-rule').textContent = d.detection || '(ikke tilgjengelig)';
+  $('install-cmd').textContent   = d.install    || '(not available)';
+  $('uninstall-cmd').textContent = d.uninstall  || '(not available)';
+  $('detection-rule').textContent = d.detection || '(not available)';
 
   setState(STATES.DETAIL);
 }
@@ -298,7 +298,7 @@ async function downloadPackage() {
 
   const btn = $('download-btn');
   btn.disabled    = true;
-  btn.textContent = '⏳ Genererer...';
+  btn.textContent = '⏳ Generating...';
 
   try {
     const res = await fetch(`${backendUrl}/api/generate-package`, {
@@ -317,10 +317,10 @@ async function downloadPackage() {
     a.click();
     URL.revokeObjectURL(url);
   } catch (err) {
-    alert(`Nedlasting feilet: ${err.message}`);
+    alert(`Download failed: ${err.message}`);
   } finally {
     btn.disabled    = false;
-    btn.textContent = '⬇ Last ned pakke (ZIP)';
+    btn.textContent = '⬇ Download package (ZIP)';
   }
 }
 
@@ -344,7 +344,7 @@ function resetSteps() {
   [1, 2, 3].forEach(n => {
     const el = $(`step-${n}`);
     el.classList.remove('active', 'done');
-    $(`step-${n}-desc`).textContent = 'Venter';
+    $(`step-${n}-desc`).textContent = 'Waiting';
   });
 }
 

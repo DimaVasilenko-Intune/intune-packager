@@ -1,8 +1,8 @@
 # Intune Packager
 
-> Chrome-extension + Node.js backend for å detektere og pakke Windows-installere til Microsoft Intune.
+> Chrome extension + Node.js backend that detects and packages Windows installers for Microsoft Intune deployment.
 
-Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript med silent install/uninstall-kommandoer og detection rules — klar til bruk i Intune Win32-deployering.
+Automatically analyzes vendor pages and generates ready-to-use PowerShell scripts with silent install/uninstall commands and detection rules — ready for Intune Win32 app deployment.
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D20.18.1-green)
@@ -10,130 +10,130 @@ Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript me
 
 ---
 
-## ⚡ Quick Start (Windows — 5 minutter)
+## ⚡ Quick Start (Windows — 5 minutes)
 
-> Ingen tidligere erfaring med Node.js eller Chrome-extensions nødvendig.
+> No prior experience with Node.js or Chrome extensions required.
 
-### Steg 1 — Last ned repoet
+### Step 1 — Download the repo
 
-Klikk den grønne **Code**-knappen øverst → **Download ZIP** → pakk ut til f.eks. `C:\intune-packager\`
+Click the green **Code** button at the top → **Download ZIP** → extract to e.g. `C:\intune-packager\`
 
-*(Alternativt hvis du har Git: `git clone https://github.com/DimaVasilenko-Intune/intune-packager`)*
+*(Alternatively, if you have Git: `git clone https://github.com/DimaVasilenko-Intune/intune-packager`)*
 
-### Steg 2 — Installer Node.js (én gang)
+### Step 2 — Install Node.js (one time)
 
-1. Gå til **[nodejs.org](https://nodejs.org)** → last ned **LTS**-versjonen
-2. Kjør installeren, klikk Next hele veien
-3. Restart PC hvis du blir bedt om det
+1. Go to **[nodejs.org](https://nodejs.org)** → download the **LTS** version
+2. Run the installer, click Next through all steps
+3. Restart your PC if prompted
 
-Verifiser at det virket — åpne **Ledetekst** (`Win + R` → skriv `cmd` → Enter):
+Verify it works — open **Command Prompt** (`Win + R` → type `cmd` → Enter):
 ```
 node --version
 ```
-Skal vise noe som `v22.x.x`. Da er du klar.
+Should show something like `v22.x.x`. You're good to go.
 
-### Steg 3 — Start backend-serveren
+### Step 3 — Start the backend server
 
-I samme Ledetekst-vindu:
+In the same Command Prompt window:
 ```
 cd C:\intune-packager\backend
 npm install
 npm start
 ```
 
-`npm install` tar 30–60 sekunder første gang. Etterpå skal du se:
+`npm install` takes 30–60 seconds the first time. After that you should see:
 ```
   Intune Packager backend
   → http://localhost:3001/health
 ```
 
-**La dette vinduet stå åpent** mens du bruker extension-en. Serveren stopper hvis du lukker det.
+**Keep this window open** while using the extension. The server stops if you close it.
 
-### Steg 4 — Last inn extension i Chrome
+### Step 4 — Load the extension in Chrome
 
-1. Åpne Chrome og gå til: `chrome://extensions/`
-2. Skru på **Developer mode** (toggle øverst til høyre)
-3. Klikk **Load unpacked**
-4. Naviger til mappen `C:\intune-packager\extension\` → klikk **Select Folder**
+1. Open Chrome and go to: `chrome://extensions/`
+2. Turn on **Developer mode** (toggle in the upper right)
+3. Click **Load unpacked**
+4. Navigate to the `C:\intune-packager\extension\` folder → click **Select Folder**
 
-Et blått pakke-ikon dukker opp i Chrome-verktøylinjen. Klikk på det for å feste det (📌).
+A blue package icon appears in the Chrome toolbar. Click the pin icon (📌) to keep it visible.
 
-### Steg 5 — Test det
+### Step 5 — Test it
 
-1. Gå til f.eks. [7-zip.org/download.html](https://www.7-zip.org/download.html)
-2. Klikk extension-ikonet — du skal se **● Tilkoblet** øverst
-3. Klikk **Scan siden**
-4. Installer-kortene dukker opp → klikk et kort → kopier kommandoer eller last ned ZIP
+1. Go to e.g. [7-zip.org/download.html](https://www.7-zip.org/download.html)
+2. Click the extension icon — you should see **● Connected** at the top
+3. Click **Scan page**
+4. Installer cards appear → click a card → copy commands or download ZIP
 
-**Ferdig.** ZIP-filen inneholder Install.ps1, Uninstall.ps1 og Detection.ps1 klare for Intune.
-
----
-
-> **Neste gang** trenger du bare å starte backend igjen (Steg 3) — Node.js og extension er allerede installert.
+**Done.** The ZIP file contains Install.ps1, Uninstall.ps1, and Detection.ps1 ready for Intune.
 
 ---
 
-## Skjermbilde
+> **Next time** you only need to start the backend again (Step 3) — Node.js and the extension are already installed.
+
+---
+
+## Screenshot
 
 ```
 ┌─────────────────────────────────────────┐
-│  📦 Intune Packager        ● Tilkoblet ⚙│
+│  📦 Intune Packager       ● Connected ⚙│
 ├─────────────────────────────────────────┤
 │  [MSI]  Setup-3.2.1-x64.msi      ●HIGH │
-│  v3.2.1 · 45 MB · Funnet på siden       │
+│  v3.2.1 · 45 MB · Found on page         │
 ├─────────────────────────────────────────┤
 │  [EXE]  zoom_x64.exe             ◐MED  │
-│  Funnet på siden                        │
+│  Found on page                          │
 └─────────────────────────────────────────┘
 ```
 
 ---
 
-## Funksjoner
+## Features
 
-| Funksjon | Beskrivelse |
+| Feature | Description |
 |---|---|
-| **Automatisk deteksjon** | Skanner DOM for `.msi`, `.exe`, `.msix`-lenker og kodeblokker |
-| **BFS-crawler** | Crawles leverandørens nettsted (maks 10 sider) med retry og rate-limiting |
-| **SSRF-beskyttelse** | URL-validering blokkerer private IP-ranges, loopback og cloud metadata-endepunkter |
-| **Regex-analyse** | Utvidet mønstergjenkjenning for msiexec, Inno Setup, NSIS, InstallShield, WiX |
-| **AI-analyse** | Valgfri analyse via Claude (Haiku) eller OpenAI (GPT-4o mini) |
-| **Input-validering** | Alle API-ruter valideres med Zod-skjemaer (type, lengde, format) |
-| **ZIP-pakke** | Genererer komplett Intune-pakke med Install/Uninstall/Detection PS1-skript |
-| **Sikkerhetshardening** | Helmet, rate limiting, compression, CORS-konfigurasjon, PS1-sanitering |
-| **En-klikk kopier** | Alle kommandoer har direkte kopieringsknapp |
-| **Mørkt tema** | 400px popup med moderne dark UI og state machine |
-| **Options-side** | Konfigurasjon av backend-URL, AI-leverandør og API-nøkkel |
+| **Auto-detection** | Scans DOM for `.msi`, `.exe`, `.msix` links and code blocks |
+| **BFS crawler** | Crawls vendor websites (max 10 pages) with retry and rate-limiting |
+| **SSRF protection** | URL validation blocks private IP ranges, loopback, and cloud metadata endpoints |
+| **Regex analysis** | Advanced pattern matching for msiexec, Inno Setup, NSIS, InstallShield, WiX |
+| **AI analysis** | Optional analysis via Claude (Haiku) or OpenAI (GPT-4o mini) |
+| **Input validation** | All API routes validated with Zod schemas (type, length, format) |
+| **ZIP package** | Generates complete Intune package with Install/Uninstall/Detection PS1 scripts |
+| **Security hardening** | Helmet, rate limiting, compression, CORS configuration, PS1 sanitization |
+| **One-click copy** | All commands have a direct copy button |
+| **Dark theme** | 400px popup with modern dark UI and state machine |
+| **Options page** | Configuration for backend URL, AI provider, and API key |
 
 ---
 
-## Prosjektstruktur
+## Project Structure
 
 ```
 intune-packager/
 ├── extension/                    ← Chrome extension (load unpacked)
 │   ├── manifest.json
 │   ├── background/
-│   │   └── service-worker.js     Tab-state og meldingshåndtering
+│   │   └── service-worker.js     Tab state and message handling
 │   ├── content/
-│   │   └── detector.js           DOM-skanner for installere
+│   │   └── detector.js           DOM scanner for installers
 │   ├── popup/
-│   │   ├── popup.html            400px mørk UI
-│   │   ├── popup.css             Design tokens + state-klasser
+│   │   ├── popup.html            400px dark UI
+│   │   ├── popup.css             Design tokens + state classes
 │   │   └── popup.js              5-state machine (idle/scanning/results/detail/error)
 │   ├── options/
-│   │   ├── options.html          Innstillingside
+│   │   ├── options.html          Settings page
 │   │   ├── options.css
 │   │   └── options.js
 │   └── assets/icons/
 │       ├── icon16.png
 │       ├── icon48.png
 │       ├── icon128.png
-│       └── generate-icons.js     Regenerer ikoner: node generate-icons.js
+│       └── generate-icons.js     Regenerate icons: node generate-icons.js
 │
 └── backend/                      ← Node.js Express server
     ├── package.json
-    ├── server.js                 Inngangspunkt, port 3001
+    ├── server.js                 Entry point, port 3001
     └── src/
         ├── routes/
         │   ├── health.js         GET  /health
@@ -141,30 +141,31 @@ intune-packager/
         │   └── generate-package.js POST /api/generate-package
         ├── services/
         │   ├── crawler/
-        │   │   ├── index.js      BFS-orchestrator (maks 10 sider)
-        │   │   └── fetcher.js    HTTP + retry + rate-limiting
+        │   │   ├── index.js      BFS orchestrator (max 10 pages)
+        │   │   ├── fetcher.js    HTTP + retry + rate-limiting + SSRF validation
+        │   │   └── url-validator.js  SSRF protection (blocks private IPs/metadata)
         │   ├── analyzer/
-        │   │   ├── index.js      Velger AI eller regex, merger resultater
-        │   │   ├── ai-analyzer.js  Claude + OpenAI API-klienter
-        │   │   └── regex-analyzer.js  Utvidede regex-mønstre
+        │   │   ├── index.js      Selects AI or regex, merges results
+        │   │   ├── ai-analyzer.js  Claude + OpenAI API clients
+        │   │   └── regex-analyzer.js  Advanced regex patterns
         │   └── packager/
-        │       ├── index.js      ZIP-generering med archiver
+        │       ├── index.js      ZIP generation with archiver
         │       └── templates/
         │           ├── Install.ps1
         │           ├── Uninstall.ps1
         │           └── Detection.ps1
         └── middleware/
-            └── error-handler.js  Konsistent JSON-feilformat
+            └── error-handler.js  Consistent JSON error format
 ```
 
 ---
 
-## Kom i gang
+## Getting Started
 
-### Krav
+### Requirements
 - Node.js 20.18.1+
 - Chrome / Chromium
-- (Valgfritt) API-nøkkel fra [Anthropic](https://console.anthropic.com) eller [OpenAI](https://platform.openai.com)
+- (Optional) API key from [Anthropic](https://console.anthropic.com) or [OpenAI](https://platform.openai.com)
 
 ### 1 — Start backend
 
@@ -175,46 +176,46 @@ npm start
 # → http://localhost:3001/health
 ```
 
-Verifiser at den kjører:
+Verify it's running:
 ```bash
 curl http://localhost:3001/health
 # {"status":"ok","version":"1.0.0","aiProvider":"none",...}
 ```
 
-### 2 — Last inn extension
+### 2 — Load extension
 
-1. Åpne Chrome og gå til `chrome://extensions/`
-2. Aktiver **Developer mode** (øverst til høyre)
-3. Klikk **Load unpacked**
-4. Velg mappen `extension/` i dette repoet
-5. Extension-ikonet dukker opp i verktøylinjen
+1. Open Chrome and go to `chrome://extensions/`
+2. Enable **Developer mode** (upper right)
+3. Click **Load unpacked**
+4. Select the `extension/` folder in this repo
+5. The extension icon appears in the toolbar
 
-### 3 — Verifiser tilkobling
+### 3 — Verify connection
 
-Klikk på extension-ikonet. Headeren skal vise `● Tilkoblet`. Grønn dot = backend er oppe.
+Click the extension icon. The header should show `● Connected`. Green dot = backend is running.
 
 ---
 
-## Bruk
+## Usage
 
-1. Gå til en leverandørside, f.eks. `zoom.us/download`, `7-zip.org`, `code.visualstudio.com/download`
-2. Klikk extension-ikonet → **Scan siden**
-3. Extension-en skanner siden, crawles leverandørdomenet og analyserer installere
-4. Klikk på et installer-kort for detaljvisning
-5. Kopier install/uninstall-kommandoer eller detection rule med ett klikk
-6. Klikk **Last ned pakke (ZIP)** for å laste ned ferdig Intune-pakke
+1. Navigate to a vendor page, e.g. `zoom.us/download`, `7-zip.org`, `code.visualstudio.com/download`
+2. Click the extension icon → **Scan page**
+3. The extension scans the page, crawls the vendor domain, and analyzes installers
+4. Click an installer card for the detail view
+5. Copy install/uninstall commands or detection rule with one click
+6. Click **Download package (ZIP)** to download the complete Intune package
 
-### Generert ZIP-innhold
+### Generated ZIP contents
 
-| Fil | Beskrivelse |
+| File | Description |
 |---|---|
-| `Install.ps1` | Silent install med exit-kode-håndtering og logging |
-| `Uninstall.ps1` | Silent uninstall med cleanup |
-| `Detection.ps1` | Intune detection rule (exit 0 = installert, exit 1 = ikke installert) |
-| `metadata.json` | App-info, versjon, kilde-URL, Intune-innstillinger |
-| `README.txt` | Instruksjoner, verifiseringssjekkliste |
+| `Install.ps1` | Silent install with exit code handling and logging |
+| `Uninstall.ps1` | Silent uninstall with cleanup |
+| `Detection.ps1` | Intune detection rule (exit 0 = installed, exit 1 = not installed) |
+| `metadata.json` | App info, version, source URL, Intune settings |
+| `README.txt` | Instructions, verification checklist |
 
-### Intune-oppsett (Win32-app)
+### Intune setup (Win32 app)
 
 ```
 Install command:   powershell.exe -ExecutionPolicy Bypass -File Install.ps1
@@ -224,20 +225,20 @@ Detection rule:    Custom script: Detection.ps1
 
 ---
 
-## AI-analyse (valgfritt)
+## AI Analysis (optional)
 
-Gå til ⚙ **Innstillinger** i extension-popupen.
+Go to ⚙ **Settings** in the extension popup.
 
-| Innstilling | Beskrivelse |
+| Setting | Description |
 |---|---|
-| **AI-leverandør** | Ingen / OpenAI / Claude |
-| **API-nøkkel** | Lagres lokalt i `chrome.storage.local` (synkes ikke), sendes kun til valgt AI |
-| **Analysemodus** | AI-first med regex-fallback (anbefalt) / Kun regex |
+| **AI provider** | None / OpenAI / Claude |
+| **API key** | Stored locally in `chrome.storage.local` (not synced), only sent to selected AI |
+| **Analysis mode** | AI-first with regex fallback (recommended) / Regex only |
 
-**Claude (Haiku)** — rask og rimelig, god på strukturert ekstraksjon
-**OpenAI (GPT-4o mini)** — alternativ med god JSON-output
+**Claude (Haiku)** — fast and affordable, great at structured extraction
+**OpenAI (GPT-4o mini)** — alternative with good JSON output
 
-Uten AI-nøkkel brukes alltid regex-analysen som fallback.
+Without an AI key, the regex analyzer is always used as fallback.
 
 ---
 
@@ -266,7 +267,7 @@ Uten AI-nøkkel brukes alltid regex-analysen som fallback.
 }
 ```
 
-**Headers (valgfritt):**
+**Headers (optional):**
 ```
 x-ai-provider: claude | openai | none
 x-ai-key: sk-ant-... | sk-...
@@ -292,62 +293,62 @@ x-analyze-mode: ai-first | regex-only
 
 ### `POST /api/generate-package`
 
-Sender inn hele analyse-resultatet (fra `/api/analyze`) og mottar en ZIP-fil.
+Send the full analysis result (from `/api/analyze`) and receive a ZIP file.
 
 ```bash
 curl -X POST http://localhost:3001/api/generate-package \
   -H "Content-Type: application/json" \
-  -d @analyse-result.json \
-  --output pakke.zip
+  -d @analysis-result.json \
+  --output package.zip
 ```
 
 ---
 
-## Analyse-detaljer
+## Analysis Details
 
-### Regex-mønstre
+### Regex Patterns
 
-Regex-analyzeren dekker:
+The regex analyzer covers:
 
-- **msiexec** — alle flaggkombinasjoner (`/i`, `/quiet`, `/qn`, `/norestart`, logging)
-- **GUID/ProductCode** — `{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}` fra alle kontekster
-- **EXE-rammeverk** — Inno Setup, NSIS, InstallShield, WiX, Advanced Installer
-- **Registry-stier** — `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\...`
-- **Fil-stier** — `%ProgramFiles%`, `C:\Program Files\...`
-- **Versjonsnummer** — fra filnavn og dokumentasjonstekst
+- **msiexec** — all flag combinations (`/i`, `/quiet`, `/qn`, `/norestart`, logging)
+- **GUID/ProductCode** — `{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}` from all contexts
+- **EXE frameworks** — Inno Setup, NSIS, InstallShield, WiX, Advanced Installer
+- **Registry paths** — `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\...`
+- **File paths** — `%ProgramFiles%`, `C:\Program Files\...`
+- **Version numbers** — from filenames and documentation text
 
-### Konfidensscoring
+### Confidence Scoring
 
-| Poeng | Kilde |
+| Points | Source |
 |---|---|
-| +30 | GUID/ProductCode funnet |
-| +15 | MSI/MSIX-type |
-| +10 | EXE-rammeverk identifisert |
-| +8  | `/quiet`-flagg i install-kommando |
-| +5  | `/norestart`-flagg |
-| +7  | `msiexec`-kommando |
+| +30 | GUID/ProductCode found |
+| +15 | MSI/MSIX type |
+| +10 | EXE framework identified |
+| +8  | `/quiet` flag in install command |
+| +5  | `/norestart` flag |
+| +7  | `msiexec` command |
 | +10 | Uninstall via GUID |
 | +5  | Detection via `Test-Path` |
 
 ---
 
-## Utvikling
+## Development
 
-### Dev-modus backend
+### Dev mode backend
 
 ```bash
 cd backend
-npm run dev    # node --watch (auto-restart ved endringer)
+npm run dev    # node --watch (auto-restart on changes)
 ```
 
-### Regenerer ikoner
+### Regenerate icons
 
 ```bash
 cd extension/assets/icons
 node generate-icons.js
 ```
 
-### Kjør en lokal analyse
+### Run a local analysis
 
 ```bash
 curl -X POST http://localhost:3001/api/analyze \
@@ -362,71 +363,71 @@ curl -X POST http://localhost:3001/api/analyze \
 
 ---
 
-## Feilsøking
+## Troubleshooting
 
-| Problem | Løsning |
+| Problem | Solution |
 |---|---|
-| Rød dot i popup | Start backend: `cd backend && npm start` |
-| "Ingen installere funnet" | Siden har kanskje JavaScript-rendret nedlastingslenker. Backend crawlen vil likevel analysere URL-en. |
-| Lav konfidens | Leverandørsiden mangler dokumentasjon. Bruk AI-modus for bedre resultat. |
-| AI-analyse feiler | Sjekk at API-nøkkelen er korrekt i innstillinger. Extension faller automatisk tilbake til regex. |
-| CORS-feil | Sjekk at backend kjører på riktig port (standard: 3001) |
+| Red dot in popup | Start backend: `cd backend && npm start` |
+| "No installers found" | The page may use JavaScript-rendered download links. The backend crawler will still analyze the URL. |
+| Low confidence | The vendor page lacks documentation. Use AI mode for better results. |
+| AI analysis fails | Check that the API key is correct in settings. The extension automatically falls back to regex. |
+| CORS error | Verify the backend is running on the correct port (default: 3001) |
 
-**Backend-logg:**
+**Backend log:**
 ```
 GET /health 200 - 2.3 ms
 [analyze] ZoomInstallerFull.msi (msi) from https://zoom.us/download
 [analyze] crawled 4 pages, 18432 chars
 ```
 
-**Intune Management Extension-logg (på klient):**
+**Intune Management Extension log (on client):**
 ```
 C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\IntuneManagementExtension.log
 ```
 
 ---
 
-## Bidrag
+## Contributing
 
-Pull requests mottas med takk. Åpne gjerne en issue for bugs eller forslag.
+Pull requests are welcome. Feel free to open an issue for bugs or suggestions.
 
 ---
 
-## Produksjons-deploy
+## Production Deployment
 
-For kjøring i produksjon:
+For running in production:
 
 ```bash
 cd backend
-NODE_ENV=production CORS_ORIGINS=https://din-domain.no npm start
+NODE_ENV=production CORS_ORIGINS=https://your-domain.com npm start
 ```
 
 **Windows:**
 ```cmd
 cd backend
 set NODE_ENV=production
-set CORS_ORIGINS=https://din-domain.no
+set CORS_ORIGINS=https://your-domain.com
 npm run start:win
 ```
 
-| Miljøvariabel | Beskrivelse | Standard |
+| Environment Variable | Description | Default |
 |---|---|---|
-| `NODE_ENV` | `production` aktiverer streng CORS, rate limiting (30/min) og `combined` logging | `development` |
-| `CORS_ORIGINS` | Kommaseparert liste over tillatte CORS-origins | Alle tillatt (dev) |
-| `PORT` | Server-port | `3001` |
+| `NODE_ENV` | `production` enables strict CORS, rate limiting (30/min), and `combined` logging | `development` |
+| `CORS_ORIGINS` | Comma-separated list of allowed CORS origins | All allowed (dev) |
+| `PORT` | Server port | `3001` |
 
-### Sikkerhetstiltak i produksjon
+### Production Security Measures
 
-- **Helmet** — Security-headere (CSP, HSTS, X-Frame-Options, etc.)
-- **Rate limiting** — 30 requests/minutt per IP på `/api/`-ruter
-- **Compression** — Gzip/Brotli for alle responses
-- **SSRF-beskyttelse** — Blokkerer private IP, loopback, cloud metadata
-- **Input-validering** — Zod-skjemaer på alle ruter
-- **PS1-sanitering** — Fjerner shell-operatorer fra template-verdier
-- **Graceful shutdown** — Håndterer SIGTERM/SIGINT med 10s timeout
+- **Helmet** — Security headers (CSP, HSTS, X-Frame-Options, etc.)
+- **Rate limiting** — 30 requests/minute per IP on `/api/` routes
+- **Compression** — Gzip/Brotli for all responses
+- **SSRF protection** — Blocks private IPs, loopback, cloud metadata
+- **Input validation** — Zod schemas on all routes
+- **PS1 sanitization** — Strips shell operators from template values
+- **Graceful shutdown** — Handles SIGTERM/SIGINT with 10s timeout
 
 ---
 
-## Lisens
+## License
 
 MIT

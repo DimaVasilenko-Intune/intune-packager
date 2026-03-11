@@ -47,10 +47,10 @@ async function generatePackage(result) {
     SOURCE_URL:      sanitizePS(sourceUrl || 'unknown'),
     GENERATED_DATE:  new Date().toISOString(),
     INSTALL_CMD:     sanitizePS(install),
-    INSTALL_PROCESS: buildInstallProcess(install, filename, type),
-    INSTALL_ARGS:    buildInstallArgs(install, filename, type),
-    UNINSTALL_SCRIPT:buildUninstallScript(uninstall, guid, type),
-    DETECTION_SCRIPT:detection || buildFallbackDetection(appName),
+    INSTALL_PROCESS: sanitizePS(buildInstallProcess(install, filename, type)),
+    INSTALL_ARGS:    sanitizePS(buildInstallArgs(install, filename, type)),
+    UNINSTALL_SCRIPT:sanitizePS(buildUninstallScript(uninstall, guid, type)),
+    DETECTION_SCRIPT:sanitizePS(detection || buildFallbackDetection(appName)),
   };
 
   // Read templates (from cache)
@@ -149,11 +149,12 @@ function buildInstallProcess(installCmd, filename, type) {
 function buildInstallArgs(installCmd, filename, type) {
   if (type === 'msi' || installCmd.toLowerCase().includes('msiexec')) {
     const argsMatch = installCmd.match(/msiexec(?:\.exe)?\s+(.+)/i);
-    return argsMatch ? argsMatch[1].replace(/"/g, "'") : `/i "${filename}" /quiet /norestart`;
+    // Remove double quotes — the PS1 template already wraps in single quotes
+    return argsMatch ? argsMatch[1].replace(/"/g, '') : `/i ${filename} /quiet /norestart`;
   }
   // Strip executable from front
   const argsMatch = installCmd.match(/^"?[^"]+\.exe"?\s+(.+)/i);
-  return argsMatch ? argsMatch[1] : '/quiet /norestart';
+  return argsMatch ? argsMatch[1].replace(/"/g, '') : '/quiet /norestart';
 }
 
 function buildUninstallScript(uninstall, guid, type) {

@@ -6,6 +6,7 @@ const fetcher  = require('./fetcher');
 
 const MAX_PAGES     = 10;
 const MAX_TEXT_CHARS = 40_000;
+const MAX_CRAWL_MS   = 45_000; // 45s aggregate timeout
 
 // Paths / keywords that indicate installer documentation
 const DOC_KEYWORDS = [
@@ -34,8 +35,9 @@ async function crawl(startUrl) {
   let   totalChars  = 0;
   let   pagesCrawled = 0;
   const rateLimiter = fetcher.createRateLimiter();
+  const deadline    = Date.now() + MAX_CRAWL_MS;
 
-  while (queue.length > 0 && pagesCrawled < MAX_PAGES) {
+  while (queue.length > 0 && pagesCrawled < MAX_PAGES && Date.now() < deadline) {
     const url = queue.shift();
     if (visited.has(url)) continue;
     visited.add(url);

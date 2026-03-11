@@ -40,7 +40,9 @@ function isPrivateIP(ip) {
 
 /**
  * Validate a URL is safe to fetch (no SSRF).
+ * Returns the resolved IP so the caller can pin DNS.
  * @param {string} urlStr
+ * @returns {Promise<{resolvedIP: string}>}
  * @throws {Error} if the URL is blocked
  */
 async function validateUrl(urlStr) {
@@ -62,16 +64,20 @@ async function validateUrl(urlStr) {
     throw new Error(`Blocked host: ${hostname}`);
   }
 
-  // DNS resolve to check for private IPs
+  // DNS resolve and pin the IP to prevent rebinding attacks
+  let resolvedIP = null;
   try {
     const { address } = await dnsLookup(hostname);
     if (isPrivateIP(address)) {
       throw new Error(`Blocked: ${hostname} resolves to private IP ${address}`);
     }
+    resolvedIP = address;
   } catch (err) {
     if (err.message.startsWith('Blocked')) throw err;
     // DNS failures — let axios handle it
   }
+
+  return { resolvedIP };
 }
 
 module.exports = { validateUrl, isPrivateIP };

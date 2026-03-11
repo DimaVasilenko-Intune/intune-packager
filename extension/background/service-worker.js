@@ -21,24 +21,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     );
     return true; // keep channel open for async response
   }
-
-  // Store scan results per tab (used to persist across popup close/open)
-  if (msg.action === 'STORE_RESULTS') {
-    chrome.storage.session
-      .set({ [`results_${sender.tab?.id}`]: msg.results })
-      .then(() => sendResponse({ ok: true }))
-      .catch(err => sendResponse({ ok: false, error: err.message }));
-    return true;
-  }
-
-  // Clear results for a tab
-  if (msg.action === 'CLEAR_RESULTS') {
-    chrome.storage.session
-      .remove([`results_${msg.tabId}`])
-      .then(() => sendResponse({ ok: true }))
-      .catch(err => sendResponse({ ok: false, error: err.message }));
-    return true;
-  }
 });
 
 // Clean up stored results when a tab is closed

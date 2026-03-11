@@ -9,13 +9,6 @@
   "background": {
     "service_worker": "background/service-worker.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://*/*", "http://*/*"],
-      "js": ["content/detector.js"],
-      "run_at": "document_idle"
-    }
-  ],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {

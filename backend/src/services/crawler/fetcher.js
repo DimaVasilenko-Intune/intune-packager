@@ -1,6 +1,8 @@
 'use strict';
 
 const axios = require('axios');
+const http  = require('http');
+const https = require('https');
 const { validateUrl } = require('./url-validator');
 
 const DEFAULT_TIMEOUT  = 10_000;   // 10 s
@@ -28,24 +30,35 @@ function createRateLimiter() {
  * Returns { url, html, finalUrl } or null on failure.
  */
 async function fetch(url, retries = 0, rateLimiter = null) {
-  // SSRF protection: validate URL before fetching
-  await validateUrl(url);
+  // SSRF protection: validate URL and get pinned DNS result
+  const { resolvedIP } = await validateUrl(url);
 
   // Rate limiting (per-crawl instance)
   if (rateLimiter) await rateLimiter();
 
+  // Pin DNS to the validated IP to prevent rebinding attacks
+  const axiosOpts = {
+    timeout: DEFAULT_TIMEOUT,
+    maxRedirects: 5,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; IntunePkgBot/1.0)',
+      'Accept': 'text/html,application/xhtml+xml,*/*',
+      'Accept-Language': 'en-US,en;q=0.9',
+    },
+    responseType: 'text',
+    validateStatus: s => s < 400,
+  };
+
+  if (resolvedIP) {
+    const parsed = new URL(url);
+    const agent = parsed.protocol === 'https:'
+      ? new https.Agent({ lookup: (_hn, _opts, cb) => cb(null, resolvedIP, 4) })
+      : new http.Agent({ lookup: (_hn, _opts, cb) => cb(null, resolvedIP, 4) });
+    axiosOpts[parsed.protocol === 'https:' ? 'httpsAgent' : 'httpAgent'] = agent;
+  }
+
   try {
-    const response = await axios.get(url, {
-      timeout: DEFAULT_TIMEOUT,
-      maxRedirects: 5,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; IntunePkgBot/1.0)',
-        'Accept': 'text/html,application/xhtml+xml,*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-      responseType: 'text',
-      validateStatus: s => s < 400,
-    });
+    const response = await axios.get(url, axiosOpts);
 
     return {
       url,

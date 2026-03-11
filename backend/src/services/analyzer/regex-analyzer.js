@@ -2,11 +2,11 @@
 
 // ── Installer switch databases ──────────────────────────────────────────────
 const EXE_FRAMEWORKS = {
-  innoSetup:    { pattern: /inno setup|inno installer/i, silent: '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-', unsilent: '/SILENT' },
-  nsis:         { pattern: /nullsoft|nsis/i,             silent: '/S',                                           unsilent: '/S' },
-  installShield:{ pattern: /installshield/i,             silent: '/s /v"/qn /norestart"',                        unsilent: '/s' },
-  wix:          { pattern: /wix bootstrapper|wix bundle/i, silent: '/quiet /norestart',                          unsilent: '/passive' },
-  advancedInstaller: { pattern: /advanced installer/i,   silent: '/exenoui /qn',                                 unsilent: '/exepassiveui' },
+  innoSetup:    { pattern: /inno setup|inno installer/i, silent: '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-', uninstallSilent: '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' },
+  nsis:         { pattern: /nullsoft|nsis/i,             silent: '/S',                                           uninstallSilent: '/S' },
+  installShield:{ pattern: /installshield/i,             silent: '/s /v"/qn /norestart"',                        uninstallSilent: '/s' },
+  wix:          { pattern: /wix bootstrapper|wix bundle/i, silent: '/quiet /norestart',                          uninstallSilent: '/quiet /norestart' },
+  advancedInstaller: { pattern: /advanced installer/i,   silent: '/exenoui /qn',                                 uninstallSilent: '/exenoui /qn' },
 };
 
 // ── Regex patterns ──────────────────────────────────────────────────────────
@@ -174,9 +174,16 @@ function buildUninstallCommand(text, filename, type, guid, framework) {
     if (m) return m[0].replace(/\s+/g, ' ').trim();
   }
 
-  // Framework default
+  // Framework default — use the uninstaller exe (e.g. unins000.exe for Inno Setup)
   if (framework) {
-    return `".\\${filename}" ${framework.unsilent} /uninstall`;
+    if (framework.name === 'innoSetup') {
+      const appName = filename.replace(/\.[^.]+$/, '');
+      return `".\\unins000.exe" ${framework.uninstallSilent}`;
+    }
+    if (framework.name === 'nsis') {
+      return `".\\uninstall.exe" ${framework.uninstallSilent}`;
+    }
+    return `".\\${filename}" ${framework.uninstallSilent}`;
   }
 
   // Registry-based uninstall string

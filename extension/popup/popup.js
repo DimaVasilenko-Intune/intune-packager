@@ -7,6 +7,8 @@ let currentState   = STATES.IDLE;
 let scanResults    = [];
 let detailItem     = null;
 let abortRequested = false;
+let scanInProgress = false;
+let scanAbortCtrl  = null;
 let backendUrl     = 'http://localhost:3001';
 let aiProvider     = 'none';
 let aiKey          = '';
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Wire events
   $('settings-btn').onclick = () => chrome.runtime.openOptionsPage();
   $('scan-btn-idle').onclick = startScan;
-  $('cancel-btn').onclick    = () => { abortRequested = true; setState(STATES.IDLE); };
+  $('cancel-btn').onclick    = () => { abortRequested = true; scanAbortCtrl?.abort(); scanInProgress = false; setState(STATES.IDLE); };
   $('rescan-btn').onclick    = startScan;
   $('back-btn').onclick      = () => setState(STATES.RESULTS);
   $('retry-btn').onclick     = startScan;
@@ -94,7 +96,14 @@ async function restoreSessionState() {
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
 async function startScan() {
+  if (scanInProgress) return; // prevent concurrent scans
+  scanInProgress = true;
   abortRequested = false;
+
+  // Abort any in-flight fetch requests from a previous scan
+  if (scanAbortCtrl) scanAbortCtrl.abort();
+  scanAbortCtrl = new AbortController();
+
   setState(STATES.SCANNING);
   resetSteps();
 
@@ -104,13 +113,9 @@ async function startScan() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     let detected = [];
-    try {
-      detected = await chrome.tabs.sendMessage(tab.id, { action: 'DETECT_INSTALLERS' });
-    } catch {
-      // Content script may not be injected yet — try to inject
-      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content/detector.js'] });
-      detected = await chrome.tabs.sendMessage(tab.id, { action: 'DETECT_INSTALLERS' });
-    }
+    // Inject content script on demand (not auto-injected on every page)
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content/detector.js'] });
+    detected = await chrome.tabs.sendMessage(tab.id, { action: 'DETECT_INSTALLERS' });
 
     if (abortRequested) return;
 
@@ -160,8 +165,11 @@ async function startScan() {
     setState(STATES.RESULTS);
 
   } catch (err) {
+    if (err.name === 'AbortError') return; // scan was cancelled
     console.error('[popup] scan error:', err);
     showError(err.message || 'Scan failed. Check that the backend is running.');
+  } finally {
+    scanInProgress = false;
   }
 }
 
@@ -185,6 +193,7 @@ async function analyzeInstaller(item, pageUrl) {
     method:  'POST',
     headers,
     body:    JSON.stringify(body),
+    signal:  scanAbortCtrl?.signal,
   }, 60_000);
 
   if (!res.ok) {
@@ -399,13 +408,13 @@ function sanitize(name = '') {
   return name.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/\.[^.]+$/, '');
 }
 
-function escHtml(str = '') {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 async function fetchWithTimeout(url, opts = {}, ms = 10_000) {
   const ctrl = new AbortController();
   const id   = setTimeout(() => ctrl.abort(), ms);
+  // If caller passed an external signal, abort our controller when it fires
+  if (opts.signal) {
+    opts.signal.addEventListener('abort', () => ctrl.abort(), { once: true });
+  }
   try {
     return await fetch(url, { ...opts, signal: ctrl.signal });
   } finally {

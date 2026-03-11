@@ -5,7 +5,7 @@
 Analyserer leverandørsider automatisk og genererer ferdige PowerShell-skript med silent install/uninstall-kommandoer og detection rules — klar til bruk i Intune Win32-deployering.
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node](https://img.shields.io/badge/node-%3E%3D18-green)
+![Node](https://img.shields.io/badge/node-%3E%3D20.18.1-green)
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Manifest%20V3-yellow)
 
 ---
@@ -95,9 +95,12 @@ Et blått pakke-ikon dukker opp i Chrome-verktøylinjen. Klikk på det for å fe
 |---|---|
 | **Automatisk deteksjon** | Skanner DOM for `.msi`, `.exe`, `.msix`-lenker og kodeblokker |
 | **BFS-crawler** | Crawles leverandørens nettsted (maks 10 sider) med retry og rate-limiting |
+| **SSRF-beskyttelse** | URL-validering blokkerer private IP-ranges, loopback og cloud metadata-endepunkter |
 | **Regex-analyse** | Utvidet mønstergjenkjenning for msiexec, Inno Setup, NSIS, InstallShield, WiX |
 | **AI-analyse** | Valgfri analyse via Claude (Haiku) eller OpenAI (GPT-4o mini) |
+| **Input-validering** | Alle API-ruter valideres med Zod-skjemaer (type, lengde, format) |
 | **ZIP-pakke** | Genererer komplett Intune-pakke med Install/Uninstall/Detection PS1-skript |
+| **Sikkerhetshardening** | Helmet, rate limiting, compression, CORS-konfigurasjon, PS1-sanitering |
 | **En-klikk kopier** | Alle kommandoer har direkte kopieringsknapp |
 | **Mørkt tema** | 400px popup med moderne dark UI og state machine |
 | **Options-side** | Konfigurasjon av backend-URL, AI-leverandør og API-nøkkel |
@@ -159,7 +162,7 @@ intune-packager/
 ## Kom i gang
 
 ### Krav
-- Node.js 18+
+- Node.js 20.18.1+
 - Chrome / Chromium
 - (Valgfritt) API-nøkkel fra [Anthropic](https://console.anthropic.com) eller [OpenAI](https://platform.openai.com)
 
@@ -228,7 +231,7 @@ Gå til ⚙ **Innstillinger** i extension-popupen.
 | Innstilling | Beskrivelse |
 |---|---|
 | **AI-leverandør** | Ingen / OpenAI / Claude |
-| **API-nøkkel** | Lagres lokalt i Chrome storage, sendes kun til valgt AI |
+| **API-nøkkel** | Lagres lokalt i `chrome.storage.local` (synkes ikke), sendes kun til valgt AI |
 | **Analysemodus** | AI-first med regex-fallback (anbefalt) / Kun regex |
 
 **Claude (Haiku)** — rask og rimelig, god på strukturert ekstraksjon
@@ -386,6 +389,41 @@ C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\IntuneManagementExtensio
 ## Bidrag
 
 Pull requests mottas med takk. Åpne gjerne en issue for bugs eller forslag.
+
+---
+
+## Produksjons-deploy
+
+For kjøring i produksjon:
+
+```bash
+cd backend
+NODE_ENV=production CORS_ORIGINS=https://din-domain.no npm start
+```
+
+**Windows:**
+```cmd
+cd backend
+set NODE_ENV=production
+set CORS_ORIGINS=https://din-domain.no
+npm run start:win
+```
+
+| Miljøvariabel | Beskrivelse | Standard |
+|---|---|---|
+| `NODE_ENV` | `production` aktiverer streng CORS, rate limiting (30/min) og `combined` logging | `development` |
+| `CORS_ORIGINS` | Kommaseparert liste over tillatte CORS-origins | Alle tillatt (dev) |
+| `PORT` | Server-port | `3001` |
+
+### Sikkerhetstiltak i produksjon
+
+- **Helmet** — Security-headere (CSP, HSTS, X-Frame-Options, etc.)
+- **Rate limiting** — 30 requests/minutt per IP på `/api/`-ruter
+- **Compression** — Gzip/Brotli for alle responses
+- **SSRF-beskyttelse** — Blokkerer private IP, loopback, cloud metadata
+- **Input-validering** — Zod-skjemaer på alle ruter
+- **PS1-sanitering** — Fjerner shell-operatorer fra template-verdier
+- **Graceful shutdown** — Håndterer SIGTERM/SIGINT med 10s timeout
 
 ---
 
